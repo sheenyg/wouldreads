@@ -174,7 +174,7 @@ function App() {
             Sheen's Tech Daily Digest 
           </h1>
           <p className="text-muted-foreground text-lg">
-            20 automatic article recommendations a day from some of my favorite tech + culture news sources
+            Automatic article recommendations from my favorite tech + culture news sources
           </p>
         </header>
 
