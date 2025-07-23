@@ -171,7 +171,7 @@ function App() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <header className="text-center mb-8">
           <h1 className="font-display font-bold text-4xl mb-2 text-primary">
-            Sheen's Tech Daily Digest 
+            wouldreads
           </h1>
           <p className="text-muted-foreground text-lg">
             Automatic article recommendations from my favorite tech + culture news sources
@@ -231,7 +231,7 @@ function App() {
         <main>
           {sources.length === 0 ? (
             <div className="text-center py-12">
-              <h2 className="font-display text-2xl mb-4">Welcome to Daily News Curator</h2>
+              <h2 className="font-display text-2xl mb-4">Welcome to wouldreads</h2>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 Get started by adding news sources. We'll curate 50 quality articles 
                 for you each day from your trusted sources.
