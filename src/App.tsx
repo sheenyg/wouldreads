@@ -302,6 +302,9 @@ function App() {
               RSS feeds are fetched via proxy service to handle CORS restrictions
             </p>
           )}
+          <p className="mt-4 text-xs">
+            Made with love by Sheena Ganju and GitHub Spark
+          </p>
         </footer>
       </div>
     </div>
