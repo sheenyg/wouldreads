@@ -2,7 +2,7 @@
 
 ## Core Purpose & Success
 
-**Mission Statement**: A curated daily news aggregation platform that intelligently selects 2 high-quality articles from user-configured RSS sources, providing a focused reading experience without information overload.
+**Mission Statement**: A comprehensive daily news aggregation platform that displays 50 quality articles from user-configured RSS sources in randomized order, ensuring representation from all active sources while providing diverse perspectives.
 
 **Success Indicators**: 
 - Users consistently return daily to read curated articles
@@ -20,16 +20,17 @@
 
 ## Thought Process for Feature Selection
 
-**Core Problem Analysis**: Information overload in news consumption - users want quality over quantity but lack time to manually curate from multiple trusted sources.
+**Core Problem Analysis**: Users want comprehensive news coverage from trusted sources but need an organized way to discover articles without algorithmic bias. Random ordering prevents filter bubbles while source guarantees ensure balanced representation.
 
-**User Context**: Daily check-in during morning routine, commute, or focused reading time. Users value consistency and reliability over novelty.
+**User Context**: Extended reading sessions where users want comprehensive coverage from their trusted sources. Users value discovery and serendipity alongside comprehensive coverage.
 
-**Critical Path**: Configure sources → Automatic daily curation → Read selected articles → Mark as read for progress tracking
+**Critical Path**: Configure sources → Automatic daily aggregation of 50 articles → Browse randomized list → Read articles of interest → Track reading progress
 
 **Key Moments**: 
 1. First-time source configuration (onboarding)
-2. Daily article discovery (the "reveal" moment)
-3. Seamless reading experience with external links
+2. Daily article discovery across comprehensive list (the "browsing" experience)
+3. Source representation confirmation (seeing all sources represented)
+4. Serendipitous article discovery through randomization
 
 ## Essential Features
 
@@ -39,9 +40,9 @@
 - **Success Criteria**: Successfully fetches articles from 90%+ of valid RSS URLs with graceful error handling
 
 ### Intelligent Article Curation  
-- **Functionality**: Selects top 2 articles from all active sources based on recency and source rotation
-- **Purpose**: Prevents information overload while ensuring diverse perspectives
-- **Success Criteria**: Daily selection feels balanced and represents active sources proportionally
+- **Functionality**: Displays 50 articles in random order while guaranteeing at least one article from each active source
+- **Purpose**: Provides comprehensive coverage without algorithmic filtering, ensuring diverse perspectives and source representation
+- **Success Criteria**: Daily selection includes articles from 100% of active sources with genuinely random ordering
 
 ### Source Management System
 - **Functionality**: Add, remove, activate/deactivate news sources with real RSS validation

@@ -157,7 +157,7 @@ function App() {
             Daily News Curator
           </h1>
           <p className="text-muted-foreground text-lg">
-            Your curated selection of 2 quality articles each day
+            Your curated selection of 50 quality articles each day
           </p>
         </header>
 
@@ -206,7 +206,7 @@ function App() {
             <div className="text-center py-12">
               <h2 className="font-display text-2xl mb-4">Welcome to Daily News Curator</h2>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Get started by adding news sources. We'll curate 2 quality articles 
+                Get started by adding news sources. We'll curate 50 quality articles 
                 for you each day from your trusted sources.
               </p>
               <SourceManager
@@ -248,7 +248,7 @@ function App() {
                   {isToday ? "Today's Curated Articles" : "Latest Articles"}
                 </h2>
                 <p className="text-muted-foreground">
-                  {articles.filter(a => a.isRead).length} of {articles.length} articles read
+                  {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
                 </p>
               </div>
               
