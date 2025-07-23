@@ -154,10 +154,10 @@ function App() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <header className="text-center mb-8">
           <h1 className="font-display font-bold text-4xl mb-2 text-primary">
-            Daily News Curator
+            Sheen's Tech Daily Digest 
           </h1>
           <p className="text-muted-foreground text-lg">
-            Your curated selection of 50 quality articles each day
+            20 automatic article recommendations a day from some of my favorite tech + culture news sources
           </p>
         </header>
 
