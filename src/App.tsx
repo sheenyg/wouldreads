@@ -2,11 +2,13 @@ import { useEffect, useState } from "react"
 import { useKV } from '@github/spark/hooks'
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
 import { RefreshCw, Calendar } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
-import { generateMockArticles, getDateKey } from "@/lib/articleService"
+import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
 
 function App() {
@@ -14,6 +16,7 @@ function App() {
   const [articles, setArticles] = useKV<Article[]>("daily-articles", [])
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
+  const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
 
   const todayKey = getDateKey()
 
@@ -22,21 +25,21 @@ function App() {
       const defaultSources: NewsSource[] = [
         {
           id: "1",
-          name: "Example Tech News",
-          url: "https://example.com/tech/rss",
+          name: "TechCrunch",
+          url: "https://techcrunch.com/feed/",
           isActive: true
         },
         {
           id: "2", 
-          name: "Example World News",
-          url: "https://example.com/world/rss",
+          name: "BBC News - World",
+          url: "http://feeds.bbci.co.uk/news/world/rss.xml",
           isActive: true
         },
         {
           id: "3",
-          name: "Example Science Daily",
-          url: "https://example.com/science/rss", 
-          isActive: true
+          name: "Reuters - Technology",
+          url: "https://www.reutersagency.com/feed/?best-topics=tech&post_type=best",
+          isActive: false
         }
       ]
       setSources(defaultSources)
@@ -55,14 +58,39 @@ function App() {
       return
     }
 
+    const activeSources = sources.filter(s => s.isActive)
+    if (activeSources.length === 0) {
+      toast.error("Please activate at least one news source")
+      return
+    }
+
     setIsLoading(true)
     try {
-      const newArticles = generateMockArticles(sources)
+      let newArticles: Article[]
+      
+      if (useRealFeeds) {
+        toast.info("Fetching articles from RSS feeds...")
+        newArticles = await fetchArticlesFromSources(sources)
+        toast.success(`Fetched ${newArticles.length} articles from RSS feeds`)
+      } else {
+        newArticles = generateMockArticles(sources)
+        toast.success("Generated mock articles")
+      }
+      
       setArticles(newArticles)
       setLastFetchDate(todayKey)
-      toast.success("Articles refreshed successfully")
     } catch (error) {
-      toast.error("Failed to fetch articles")
+      console.error("Failed to fetch articles:", error)
+      
+      if (useRealFeeds) {
+        toast.error("Failed to fetch from RSS feeds. Using mock articles as fallback.")
+        // Fallback to mock articles if RSS fails
+        const mockArticles = generateMockArticles(sources)
+        setArticles(mockArticles)
+        setLastFetchDate(todayKey)
+      } else {
+        toast.error("Failed to generate articles")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -132,6 +160,17 @@ function App() {
               <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh Articles
             </Button>
+            
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="feed-mode"
+                checked={useRealFeeds}
+                onCheckedChange={setUseRealFeeds}
+              />
+              <Label htmlFor="feed-mode" className="text-sm">
+                {useRealFeeds ? "Live RSS" : "Mock Data"}
+              </Label>
+            </div>
           </div>
           
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -211,7 +250,13 @@ function App() {
         <footer className="mt-16 text-center text-sm text-muted-foreground">
           <p>
             Currently showing articles from {activeSources.length} active source{activeSources.length !== 1 ? 's' : ''}
+            {useRealFeeds ? " • Live RSS feeds" : " • Mock data mode"}
           </p>
+          {useRealFeeds && (
+            <p className="mt-2 text-xs">
+              RSS feeds are fetched via proxy service to handle CORS restrictions
+            </p>
+          )}
         </footer>
       </div>
     </div>
