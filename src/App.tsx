@@ -25,20 +25,38 @@ function App() {
       const defaultSources: NewsSource[] = [
         {
           id: "1",
-          name: "TechCrunch",
-          url: "https://techcrunch.com/feed/",
+          name: "The New Yorker",
+          url: "https://www.newyorker.com/feed/rss",
           isActive: true
         },
         {
           id: "2", 
-          name: "BBC News - World",
-          url: "http://feeds.bbci.co.uk/news/world/rss.xml",
+          name: "Stratechery",
+          url: "https://stratechery.com/feed/",
           isActive: true
         },
         {
           id: "3",
-          name: "Reuters - Technology",
-          url: "https://www.reutersagency.com/feed/?best-topics=tech&post_type=best",
+          name: "Sherwood News",
+          url: "https://sherwood.news/feed/",
+          isActive: false
+        },
+        {
+          id: "4",
+          name: "The New York Times",
+          url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+          isActive: false
+        },
+        {
+          id: "5",
+          name: "Hacker News",
+          url: "https://hnrss.org/frontpage",
+          isActive: false
+        },
+        {
+          id: "6",
+          name: "Semafor",
+          url: "https://www.semafor.com/rss",
           isActive: false
         }
       ]
