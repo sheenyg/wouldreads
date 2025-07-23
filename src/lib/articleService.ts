@@ -28,10 +28,12 @@ export async function fetchArticlesFromSources(sources: NewsSource[]): Promise<A
   // Fetch articles from each source
   for (const source of activeSources) {
     try {
+      console.log(`Fetching from ${source.name}: ${source.url}`)
       const articles = await fetchArticlesFromRSS(source)
+      console.log(`Successfully fetched ${articles.length} articles from ${source.name}`)
       articlesBySource[source.id] = articles
     } catch (error) {
-      console.warn(`Failed to fetch from ${source.name}:`, error)
+      console.error(`Failed to fetch from ${source.name} (${source.url}):`, error)
       // Continue with other sources even if one fails
     }
   }
@@ -68,40 +70,113 @@ export async function fetchArticlesFromSources(sources: NewsSource[]): Promise<A
 
 /**
  * Fetches and parses a single RSS feed
+ * Tries multiple possible URLs and proxy services for each source
  */
 async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
-  // Use a CORS proxy service to fetch RSS feeds
-  const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}`
+  const possibleUrls = [source.url]
   
-  try {
-    const response = await fetch(proxyUrl)
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    const data = await response.json()
-    
-    if (data.status !== 'ok') {
-      throw new Error(`RSS parsing error: ${data.message || 'Unknown error'}`)
-    }
-
-    // Convert RSS items to our Article format
-    const articles: Article[] = data.items.map((item: any, index: number) => ({
-      id: `${source.id}-${Date.now()}-${index}`,
-      title: cleanText(item.title || 'Untitled'),
-      summary: cleanText(item.description || item.content || 'No summary available'),
-      url: item.link || item.guid || '#',
-      source: source.name,
-      publishedAt: item.pubDate || new Date().toISOString(),
-      isRead: false
-    }))
-
-    return articles.slice(0, 15) // Take more articles from each source for better variety
-  } catch (error) {
-    console.error(`Error fetching RSS from ${source.name}:`, error)
-    throw error
+  // Add alternative URLs for known sources
+  if (source.name === "Sherwood News") {
+    possibleUrls.push("https://sherwood.news/rss", "https://sherwood.news/feed.xml")
+  } else if (source.name === "Semafor") {
+    possibleUrls.push("https://www.semafor.com/rss", "https://www.semafor.com/feed.xml")
+  } else if (source.name === "The New York Times") {
+    possibleUrls.push("https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "https://feeds.nytimes.com/nyt/rss/HomePage")
   }
+  
+  // Try multiple proxy services
+  const proxyServices = [
+    (url: string) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`,
+    (url: string) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+  ]
+  
+  let lastError: Error | null = null
+  
+  for (const url of possibleUrls) {
+    for (const [proxyIndex, createProxyUrl] of proxyServices.entries()) {
+      try {
+        const proxyUrl = createProxyUrl(url)
+        console.log(`Trying ${source.name} with URL: ${url} using proxy ${proxyIndex + 1}`)
+        
+        const response = await fetch(proxyUrl)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status} for ${source.name}`)
+        }
+        
+        const data = await response.json()
+        
+        let articles: Article[] = []
+        
+        if (proxyIndex === 0) {
+          // rss2json format
+          console.log(`RSS2JSON response for ${source.name} (${url}):`, data)
+          
+          if (data.status !== 'ok') {
+            throw new Error(`RSS parsing error for ${source.name}: ${data.message || 'Unknown error'}`)
+          }
+
+          if (!data.items || data.items.length === 0) {
+            throw new Error(`No articles found in RSS feed for ${source.name}`)
+          }
+
+          articles = data.items.map((item: any, index: number) => ({
+            id: `${source.id}-${Date.now()}-${index}`,
+            title: cleanText(item.title || 'Untitled'),
+            summary: cleanText(item.description || item.content || 'No summary available'),
+            url: item.link || item.guid || '#',
+            source: source.name,
+            publishedAt: item.pubDate || new Date().toISOString(),
+            isRead: false
+          }))
+        } else {
+          // allorigins format - need to parse XML manually
+          const xmlData = data.contents
+          if (!xmlData) {
+            throw new Error(`No content from allorigins for ${source.name}`)
+          }
+          
+          // Basic XML parsing for RSS
+          const parser = new DOMParser()
+          const doc = parser.parseFromString(xmlData, 'text/xml')
+          const items = doc.querySelectorAll('item')
+          
+          if (items.length === 0) {
+            throw new Error(`No items found in RSS XML for ${source.name}`)
+          }
+          
+          articles = Array.from(items).slice(0, 15).map((item, index) => {
+            const title = item.querySelector('title')?.textContent || 'Untitled'
+            const description = item.querySelector('description')?.textContent || 'No summary available'
+            const link = item.querySelector('link')?.textContent || '#'
+            const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString()
+            
+            return {
+              id: `${source.id}-${Date.now()}-${index}`,
+              title: cleanText(title),
+              summary: cleanText(description),
+              url: link,
+              source: source.name,
+              publishedAt: pubDate,
+              isRead: false
+            }
+          })
+        }
+
+        console.log(`Successfully parsed ${articles.length} articles from ${source.name} using ${url}`)
+        return articles.slice(0, 15)
+        
+      } catch (error) {
+        console.warn(`Failed to fetch ${source.name} from ${url} using proxy ${proxyIndex + 1}:`, error)
+        lastError = error as Error
+        continue // Try next proxy or URL
+      }
+    }
+  }
+  
+  // If all URLs and proxies failed, throw the last error
+  console.error(`All URLs and proxies failed for ${source.name}`)
+  throw lastError || new Error(`All RSS methods failed for ${source.name}`)
 }
 
 /**

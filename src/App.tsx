@@ -39,25 +39,25 @@ function App() {
           id: "3",
           name: "Sherwood News",
           url: "https://sherwood.news/feed/",
-          isActive: false
+          isActive: true
         },
         {
           id: "4",
           name: "The New York Times",
           url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-          isActive: false
+          isActive: true
         },
         {
           id: "5",
           name: "Hacker News",
           url: "https://hnrss.org/frontpage",
-          isActive: false
+          isActive: true
         },
         {
           id: "6",
           name: "Semafor",
-          url: "https://www.semafor.com/rss",
-          isActive: false
+          url: "https://www.semafor.com/feed",
+          isActive: true
         }
       ]
       setSources(defaultSources)
@@ -87,9 +87,19 @@ function App() {
       let newArticles: Article[]
       
       if (useRealFeeds) {
-        toast.info("Fetching articles from RSS feeds...")
+        toast.info(`Fetching articles from ${activeSources.length} RSS feeds...`)
         newArticles = await fetchArticlesFromSources(sources)
-        toast.success(`Fetched ${newArticles.length} articles from RSS feeds`)
+        
+        // Count articles per source to provide feedback
+        const sourceNames = activeSources.map(s => s.name)
+        const sourcesWithArticles = [...new Set(newArticles.map(a => a.source))]
+        const failedSources = sourceNames.filter(name => !sourcesWithArticles.includes(name))
+        
+        if (failedSources.length > 0) {
+          toast.warning(`Successfully fetched ${newArticles.length} articles. Failed sources: ${failedSources.join(', ')}`)
+        } else {
+          toast.success(`Fetched ${newArticles.length} articles from all ${sourcesWithArticles.length} sources`)
+        }
       } else {
         newArticles = generateMockArticles(sources)
         toast.success("Generated mock articles")
@@ -145,6 +155,13 @@ function App() {
     )
   }
 
+  const activateAllSources = () => {
+    setSources((current) => 
+      current.map(source => ({ ...source, isActive: true }))
+    )
+    toast.success("All sources activated")
+  }
+
   const activeSources = sources.filter(s => s.isActive)
   const isToday = lastFetchDate === todayKey
 
@@ -178,6 +195,16 @@ function App() {
               <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh Articles
             </Button>
+
+            {sources.some(s => !s.isActive) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={activateAllSources}
+              >
+                Activate All Sources
+              </Button>
+            )}
             
             <div className="flex items-center space-x-2">
               <Switch
