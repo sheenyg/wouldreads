@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { RefreshCw, Calendar } from "@phosphor-icons/react"
+import { PromptExporter } from "@/components/PromptExporter"
+import { RefreshCw, Calendar, FileText, Newspaper } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -178,119 +180,138 @@ function App() {
           </p>
         </header>
 
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <SourceManager
-              sources={sources}
-              onAddSource={addSource}
-              onRemoveSource={removeSource}
-              onToggleSource={toggleSource}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refreshArticles}
-              disabled={isLoading}
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh Articles
-            </Button>
+        <Tabs defaultValue="articles" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="articles" className="flex items-center gap-2">
+              <Newspaper className="w-4 h-4" />
+              Articles
+            </TabsTrigger>
+            <TabsTrigger value="export" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Export Prompts
+            </TabsTrigger>
+          </TabsList>
 
-            {sources.some(s => !s.isActive) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={activateAllSources}
-              >
-                Activate All Sources
-              </Button>
-            )}
-            
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="feed-mode"
-                checked={useRealFeeds}
-                onCheckedChange={setUseRealFeeds}
-              />
-              <Label htmlFor="feed-mode" className="text-sm">
-                {useRealFeeds ? "Live RSS" : "Mock Data"}
-              </Label>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="w-4 h-4" />
-            <span>
-              {isToday ? "Today's selection" : `Last updated: ${lastFetchDate || "Never"}`}
-            </span>
-          </div>
-        </div>
+          <TabsContent value="articles" className="space-y-6">
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <SourceManager
+                  sources={sources}
+                  onAddSource={addSource}
+                  onRemoveSource={removeSource}
+                  onToggleSource={toggleSource}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={refreshArticles}
+                  disabled={isLoading}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh Articles
+                </Button>
 
-        <Separator className="mb-8" />
-
-        <main>
-          {sources.length === 0 ? (
-            <div className="text-center py-12">
-              <h2 className="font-display text-2xl mb-4">Welcome to wouldreads</h2>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Get started by adding news sources. We'll curate 50 quality articles 
-                for you each day from your trusted sources.
-              </p>
-              <SourceManager
-                sources={sources}
-                onAddSource={addSource}
-                onRemoveSource={removeSource}
-                onToggleSource={toggleSource}
-              />
-            </div>
-          ) : activeSources.length === 0 ? (
-            <div className="text-center py-12">
-              <h2 className="font-display text-2xl mb-4">No Active Sources</h2>
-              <p className="text-muted-foreground mb-6">
-                You have news sources configured, but none are currently active. 
-                Activate some sources to start getting articles.
-              </p>
-              <SourceManager
-                sources={sources}
-                onAddSource={addSource}
-                onRemoveSource={removeSource}
-                onToggleSource={toggleSource}
-              />
-            </div>
-          ) : articles.length === 0 ? (
-            <div className="text-center py-12">
-              <h2 className="font-display text-2xl mb-4">Ready to Curate</h2>
-              <p className="text-muted-foreground mb-6">
-                Your sources are configured. Click refresh to get today's articles.
-              </p>
-              <Button onClick={refreshArticles} disabled={isLoading}>
-                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                Get Today's Articles
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="text-center">
-                <h2 className="font-display text-2xl mb-2">
-                  {isToday ? "Today's Curated Articles" : "Latest Articles"}
-                </h2>
-                <p className="text-muted-foreground">
-                  {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
-                </p>
+                {sources.some(s => !s.isActive) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={activateAllSources}
+                  >
+                    Activate All Sources
+                  </Button>
+                )}
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="feed-mode"
+                    checked={useRealFeeds}
+                    onCheckedChange={setUseRealFeeds}
+                  />
+                  <Label htmlFor="feed-mode" className="text-sm">
+                    {useRealFeeds ? "Live RSS" : "Mock Data"}
+                  </Label>
+                </div>
               </div>
               
-              <div className="grid gap-6">
-                {articles.map((article) => (
-                  <ArticleCard
-                    key={article.id}
-                    article={article}
-                    onToggleRead={toggleArticleRead}
-                  />
-                ))}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  {isToday ? "Today's selection" : `Last updated: ${lastFetchDate || "Never"}`}
+                </span>
               </div>
             </div>
-          )}
-        </main>
+
+            <Separator className="mb-8" />
+
+            <main>
+              {sources.length === 0 ? (
+                <div className="text-center py-12">
+                  <h2 className="font-display text-2xl mb-4">Welcome to wouldreads</h2>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Get started by adding news sources. We'll curate 50 quality articles 
+                    for you each day from your trusted sources.
+                  </p>
+                  <SourceManager
+                    sources={sources}
+                    onAddSource={addSource}
+                    onRemoveSource={removeSource}
+                    onToggleSource={toggleSource}
+                  />
+                </div>
+              ) : activeSources.length === 0 ? (
+                <div className="text-center py-12">
+                  <h2 className="font-display text-2xl mb-4">No Active Sources</h2>
+                  <p className="text-muted-foreground mb-6">
+                    You have news sources configured, but none are currently active. 
+                    Activate some sources to start getting articles.
+                  </p>
+                  <SourceManager
+                    sources={sources}
+                    onAddSource={addSource}
+                    onRemoveSource={removeSource}
+                    onToggleSource={toggleSource}
+                  />
+                </div>
+              ) : articles.length === 0 ? (
+                <div className="text-center py-12">
+                  <h2 className="font-display text-2xl mb-4">Ready to Curate</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Your sources are configured. Click refresh to get today's articles.
+                  </p>
+                  <Button onClick={refreshArticles} disabled={isLoading}>
+                    <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    Get Today's Articles
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="font-display text-2xl mb-2">
+                      {isToday ? "Today's Curated Articles" : "Latest Articles"}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
+                    </p>
+                  </div>
+                  
+                  <div className="grid gap-6">
+                    {articles.map((article) => (
+                      <ArticleCard
+                        key={article.id}
+                        article={article}
+                        onToggleRead={toggleArticleRead}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </main>
+          </TabsContent>
+
+          <TabsContent value="export">
+            <PromptExporter />
+          </TabsContent>
+        </Tabs>
 
         <footer className="mt-16 text-center text-sm text-muted-foreground">
           <p>
