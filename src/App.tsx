@@ -4,11 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { PromptExporter } from "@/components/PromptExporter"
-import { RefreshCw, Calendar, FileText, Newspaper } from "@phosphor-icons/react"
+import { RefreshCw, Calendar, Newspaper } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -180,19 +178,7 @@ function App() {
           </p>
         </header>
 
-        <Tabs defaultValue="articles" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="articles" className="flex items-center gap-2">
-              <Newspaper className="w-4 h-4" />
-              Articles
-            </TabsTrigger>
-            <TabsTrigger value="export" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Export Prompts
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="articles" className="space-y-6">
+        <div className="space-y-6">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <SourceManager
@@ -306,12 +292,7 @@ function App() {
                 </div>
               )}
             </main>
-          </TabsContent>
-
-          <TabsContent value="export">
-            <PromptExporter />
-          </TabsContent>
-        </Tabs>
+        </div>
 
         <footer className="mt-16 text-center text-sm text-muted-foreground">
           <p>
