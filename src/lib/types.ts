@@ -14,3 +14,16 @@ export interface NewsSource {
   url: string
   isActive: boolean
 }
+
+export type PlantType = 'tomato' | 'carrot' | 'lettuce' | null
+
+export interface Plot {
+  id: number
+  plantType: PlantType
+  plantedAt: string | null
+  isGrown: boolean
+}
+
+export interface Garden {
+  plots: Plot[]
+}

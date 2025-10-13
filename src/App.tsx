@@ -6,8 +6,9 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { RefreshCw, Calendar, Newspaper } from "@phosphor-icons/react"
-import { Article, NewsSource } from "@/lib/types"
+import { Garden } from "@/components/Garden"
+import { ArrowsClockwise, Calendar, Newspaper, Plant } from "@phosphor-icons/react"
+import { Article, NewsSource, Plot, PlantType } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
 
@@ -17,8 +18,23 @@ function App() {
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
   const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
+  const [activeTab, setActiveTab] = useState<'news' | 'garden'>('news')
+  const [plots, setPlots] = useKV<Plot[]>("garden-plots", [])
 
   const todayKey = getDateKey()
+
+  // Initialize garden plots
+  useEffect(() => {
+    if (plots.length === 0) {
+      const initialPlots: Plot[] = Array.from({ length: 12 }, (_, i) => ({
+        id: i,
+        plantType: null,
+        plantedAt: null,
+        isGrown: false
+      }))
+      setPlots(initialPlots)
+    }
+  }, [plots.length, setPlots])
 
   useEffect(() => {
     if (sources.length === 0) {
@@ -162,6 +178,36 @@ function App() {
     toast.success("All sources activated")
   }
 
+  const handlePlantSeed = (plotId: number, plantType: PlantType) => {
+    setPlots((current) =>
+      current.map((plot) =>
+        plot.id === plotId
+          ? {
+              ...plot,
+              plantType,
+              plantedAt: new Date().toISOString(),
+              isGrown: Math.random() > 0.5 // 50% chance to be immediately grown for demo
+            }
+          : plot
+      )
+    )
+  }
+
+  const handleHarvestPlot = (plotId: number) => {
+    setPlots((current) =>
+      current.map((plot) =>
+        plot.id === plotId
+          ? {
+              ...plot,
+              plantType: null,
+              plantedAt: null,
+              isGrown: false
+            }
+          : plot
+      )
+    )
+  }
+
   const activeSources = sources.filter(s => s.isActive)
   const isToday = lastFetchDate === todayKey
 
@@ -176,6 +222,26 @@ function App() {
           <p className="text-muted-foreground text-lg">
             Automatic article recommendations from my favorite tech + culture news sources
           </p>
+          
+          {/* Navigation Tabs */}
+          <div className="flex justify-center gap-2 mt-6">
+            <Button
+              variant={activeTab === 'news' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('news')}
+              className="gap-2"
+            >
+              <Newspaper className="w-4 h-4" />
+              News Feed
+            </Button>
+            <Button
+              variant={activeTab === 'garden' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('garden')}
+              className="gap-2"
+            >
+              <Plant className="w-4 h-4" />
+              Garden
+            </Button>
+          </div>
         </header>
 
         <div className="space-y-6">
@@ -193,7 +259,7 @@ function App() {
                   onClick={refreshArticles}
                   disabled={isLoading}
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  <ArrowsClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh Articles
                 </Button>
 
@@ -230,7 +296,13 @@ function App() {
             <Separator className="mb-8" />
 
             <main>
-              {sources.length === 0 ? (
+              {activeTab === 'garden' ? (
+                <Garden
+                  plots={plots}
+                  onPlantSeed={handlePlantSeed}
+                  onHarvestPlot={handleHarvestPlot}
+                />
+              ) : sources.length === 0 ? (
                 <div className="text-center py-12">
                   <h2 className="font-display text-2xl mb-4">Welcome to wouldreads</h2>
                   <p className="text-muted-foreground mb-6 max-w-md mx-auto">
@@ -265,7 +337,7 @@ function App() {
                     Your sources are configured. Click refresh to get today's articles.
                   </p>
                   <Button onClick={refreshArticles} disabled={isLoading}>
-                    <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    <ArrowsClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                     Get Today's Articles
                   </Button>
                 </div>

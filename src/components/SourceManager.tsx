@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, X, Settings } from "@phosphor-icons/react"
+import { Plus, X, Gear } from "@phosphor-icons/react"
 import { NewsSource } from "@/lib/types"
 import { toast } from "sonner"
 
@@ -44,7 +44,7 @@ export function SourceManager({ sources, onAddSource, onRemoveSource, onToggleSo
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Settings className="w-4 h-4 mr-2" />
+          <Gear className="w-4 h-4 mr-2" />
           Manage Sources
         </Button>
       </DialogTrigger>
