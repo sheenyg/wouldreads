@@ -179,18 +179,36 @@ function App() {
   }
 
   const handlePlantSeed = (plotId: number, plantType: PlantType) => {
+    const plantedTime = new Date().toISOString()
+    // Plants grow after 5 minutes (300000ms) - for demo purposes
+    // In production, this could be hours or days
+    const growthTimeMs = 5 * 60 * 1000
+    const currentTime = Date.now()
+    const isGrown = false // Seeds start as not grown
+    
     setPlots((current) =>
       current.map((plot) =>
         plot.id === plotId
           ? {
               ...plot,
               plantType,
-              plantedAt: new Date().toISOString(),
-              isGrown: Math.random() > 0.5 // 50% chance to be immediately grown for demo
+              plantedAt: plantedTime,
+              isGrown
             }
           : plot
       )
     )
+    
+    // Check growth after the specified time
+    setTimeout(() => {
+      setPlots((current) =>
+        current.map((plot) =>
+          plot.id === plotId && plot.plantedAt === plantedTime
+            ? { ...plot, isGrown: true }
+            : plot
+        )
+      )
+    }, growthTimeMs)
   }
 
   const handleHarvestPlot = (plotId: number) => {
