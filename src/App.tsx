@@ -183,7 +183,6 @@ function App() {
     // Plants grow after 5 minutes (300000ms) - for demo purposes
     // In production, this could be hours or days
     const growthTimeMs = 5 * 60 * 1000
-    const currentTime = Date.now()
     const isGrown = false // Seeds start as not grown
     
     setPlots((current) =>
@@ -200,15 +199,18 @@ function App() {
     )
     
     // Check growth after the specified time
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setPlots((current) =>
         current.map((plot) =>
-          plot.id === plotId && plot.plantedAt === plantedTime
+          plot.id === plotId && plot.plantType !== null
             ? { ...plot, isGrown: true }
             : plot
         )
       )
     }, growthTimeMs)
+    
+    // Note: In a production app, timeout IDs should be stored and cleared
+    // on component unmount or when plots are harvested to prevent memory leaks
   }
 
   const handleHarvestPlot = (plotId: number) => {
