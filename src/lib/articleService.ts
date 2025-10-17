@@ -15,6 +15,7 @@ function shuffleArray<T>(array: T[]): T[] {
 /**
  * Fetches and parses RSS feeds from news sources to get real articles
  * Uses CORS proxy to handle cross-origin requests to RSS feeds
+ * Optimized: Fetches all sources in parallel using Promise.all
  */
 export async function fetchArticlesFromSources(sources: NewsSource[]): Promise<Article[]> {
   const activeSources = sources.filter(s => s.isActive)
@@ -23,22 +24,23 @@ export async function fetchArticlesFromSources(sources: NewsSource[]): Promise<A
     throw new Error('No active sources configured')
   }
 
-  const articlesBySource: { [sourceId: string]: Article[] } = {}
-  
-  // Fetch articles from each source
-  for (const source of activeSources) {
+  // Fetch all sources in parallel for better performance
+  const fetchPromises = activeSources.map(async (source) => {
     try {
       console.log(`Fetching from ${source.name}: ${source.url}`)
       const articles = await fetchArticlesFromRSS(source)
       console.log(`Successfully fetched ${articles.length} articles from ${source.name}`)
-      articlesBySource[source.id] = articles
+      return { sourceId: source.id, articles }
     } catch (error) {
       console.error(`Failed to fetch from ${source.name} (${source.url}):`, error)
-      // Continue with other sources even if one fails
+      return { sourceId: source.id, articles: [] }
     }
-  }
+  })
 
-  if (Object.keys(articlesBySource).length === 0) {
+  const results = await Promise.all(fetchPromises)
+  const articlesBySource = results.filter(r => r.articles.length > 0)
+
+  if (articlesBySource.length === 0) {
     throw new Error('Failed to fetch articles from any source')
   }
 
@@ -46,26 +48,16 @@ export async function fetchArticlesFromSources(sources: NewsSource[]): Promise<A
   const guaranteedArticles: Article[] = []
   const remainingArticles: Article[] = []
   
-  for (const [sourceId, articles] of Object.entries(articlesBySource)) {
-    if (articles.length > 0) {
-      // Take the first (most recent) article from each source
-      guaranteedArticles.push(articles[0])
-      // Add the rest to the pool
-      remainingArticles.push(...articles.slice(1))
-    }
+  for (const { articles } of articlesBySource) {
+    guaranteedArticles.push(articles[0])
+    remainingArticles.push(...articles.slice(1))
   }
 
-  // Shuffle remaining articles to ensure randomness
-  const shuffledRemaining = shuffleArray([...remainingArticles])
-  
-  // Combine guaranteed articles with shuffled remaining articles
-  const allArticles = [...guaranteedArticles, ...shuffledRemaining]
-  
-  // Shuffle the entire list to randomize order while maintaining source representation
-  const finalArticles = shuffleArray(allArticles)
+  // Single shuffle of combined articles (removed redundant shuffling)
+  const allArticles = shuffleArray([...guaranteedArticles, ...remainingArticles])
   
   // Return up to 50 articles
-  return finalArticles.slice(0, 50)
+  return allArticles.slice(0, 50)
 }
 
 /**
@@ -181,6 +173,7 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
 
 /**
  * Cleans HTML tags and entities from text content
+ * Optimized: Uses a single regex pass for entity replacement
  */
 function cleanText(text: string): string {
   if (!text) return ''
@@ -188,7 +181,7 @@ function cleanText(text: string): string {
   // Remove HTML tags
   let cleaned = text.replace(/<[^>]*>/g, '')
   
-  // Decode common HTML entities
+  // Decode common HTML entities with a single regex pass
   const htmlEntities: { [key: string]: string } = {
     '&amp;': '&',
     '&lt;': '<',
@@ -201,8 +194,8 @@ function cleanText(text: string): string {
     '&ndash;': '–'
   }
   
-  Object.entries(htmlEntities).forEach(([entity, char]) => {
-    cleaned = cleaned.replace(new RegExp(entity, 'g'), char)
+  cleaned = cleaned.replace(/&(?:amp|lt|gt|quot|#39|nbsp|hellip|mdash|ndash);/g, (match) => {
+    return htmlEntities[match] || match
   })
   
   // Trim and limit length for summaries
@@ -216,6 +209,7 @@ function cleanText(text: string): string {
 
 /**
  * Legacy function for testing - generates mock articles
+ * Optimized: Reduced timestamp calculations and improved loop efficiency
  */
 export function generateMockArticles(sources: NewsSource[]): Article[] {
   const mockTitles = [
@@ -277,34 +271,23 @@ export function generateMockArticles(sources: NewsSource[]): Article[] {
     return []
   }
 
+  const now = Date.now()
   const articles: Article[] = []
+  const totalArticles = Math.min(50, mockTitles.length)
   
-  // Ensure at least one article from each source
-  availableSources.forEach((source, index) => {
-    articles.push({
-      id: `mock-${Date.now()}-${index}`,
-      title: mockTitles[index % mockTitles.length],
-      summary: `This is a detailed summary for the article "${mockTitles[index % mockTitles.length]}" providing insights and analysis on current developments in this important topic.`,
-      url: `https://example.com/article/${Date.now() + index}`,
-      source: source.name,
-      publishedAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
-      isRead: false
-    })
-  })
-  
-  // Fill remaining slots up to 50 articles
-  const remainingSlots = Math.max(0, 50 - articles.length)
-  for (let i = 0; i < remainingSlots; i++) {
-    const titleIndex = (availableSources.length + i) % mockTitles.length
+  // Generate all articles in a single loop
+  for (let i = 0; i < totalArticles; i++) {
+    const titleIndex = i % mockTitles.length
     const sourceIndex = i % availableSources.length
+    const title = mockTitles[titleIndex]
     
     articles.push({
-      id: `mock-${Date.now()}-${availableSources.length + i}`,
-      title: mockTitles[titleIndex],
-      summary: `This is a detailed summary for the article "${mockTitles[titleIndex]}" providing insights and analysis on current developments in this important topic.`,
-      url: `https://example.com/article/${Date.now() + availableSources.length + i}`,
+      id: `mock-${now}-${i}`,
+      title,
+      summary: `This is a detailed summary for the article "${title}" providing insights and analysis on current developments in this important topic.`,
+      url: `https://example.com/article/${now + i}`,
       source: availableSources[sourceIndex].name,
-      publishedAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
       isRead: false
     })
   }

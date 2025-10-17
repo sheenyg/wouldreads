@@ -1,3 +1,4 @@
+import { memo } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,7 +11,7 @@ interface ArticleCardProps {
   onToggleRead: (id: string) => void
 }
 
-export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
+export const ArticleCard = memo(function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
   return (
     <Card className={cn(
       "transition-all duration-200 hover:shadow-lg border-2",
@@ -81,4 +82,4 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
       </CardContent>
     </Card>
   )
-}
+})

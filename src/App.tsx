@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import { useKV } from '@github/spark/hooks'
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -19,6 +19,9 @@ function App() {
   const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
 
   const todayKey = getDateKey()
+
+  // Memoize active sources to avoid recalculation on every render
+  const activeSources = useMemo(() => sources.filter(s => s.isActive), [sources])
 
   useEffect(() => {
     if (sources.length === 0) {
@@ -64,19 +67,12 @@ function App() {
     }
   }, [sources.length, setSources])
 
-  useEffect(() => {
-    if (sources.length > 0 && lastFetchDate !== todayKey) {
-      refreshArticles()
-    }
-  }, [sources, lastFetchDate, todayKey])
-
-  const refreshArticles = async () => {
+  const refreshArticles = useCallback(async () => {
     if (sources.length === 0) {
       toast.error("Please add news sources first")
       return
     }
 
-    const activeSources = sources.filter(s => s.isActive)
     if (activeSources.length === 0) {
       toast.error("Please activate at least one news source")
       return
@@ -122,7 +118,13 @@ function App() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [sources, activeSources, useRealFeeds, todayKey, setArticles, setLastFetchDate])
+
+  useEffect(() => {
+    if (sources.length > 0 && lastFetchDate !== todayKey) {
+      refreshArticles()
+    }
+  }, [sources.length, lastFetchDate, todayKey, refreshArticles])
 
   const addSource = (name: string, url: string) => {
     const newSource: NewsSource = {
@@ -147,13 +149,13 @@ function App() {
     )
   }
 
-  const toggleArticleRead = (articleId: string) => {
+  const toggleArticleRead = useCallback((articleId: string) => {
     setArticles((current) => 
       current.map(article => 
         article.id === articleId ? { ...article, isRead: !article.isRead } : article
       )
     )
-  }
+  }, [setArticles])
 
   const activateAllSources = () => {
     setSources((current) => 
@@ -162,8 +164,8 @@ function App() {
     toast.success("All sources activated")
   }
 
-  const activeSources = sources.filter(s => s.isActive)
-  const isToday = lastFetchDate === todayKey
+  // Memoize isToday check to avoid recalculation
+  const isToday = useMemo(() => lastFetchDate === todayKey, [lastFetchDate, todayKey])
 
   return (
     <div className="min-h-screen bg-background">
