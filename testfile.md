@@ -1,5 +1,1 @@
-OpenAI has successfully converted to a more traditional corporate structure, a move that cleared an obstacle for a potential initial public offering and pushed the valuation of longtime partner Microsoft MSFT 2.30%increase; green up pointing triangle above $4 trillion.
-
-The artificial-intelligence startup has turned its for-profit subsidiary into a public-benefit corporation, of which Microsoft will own 27%. The conversion will grant OpenAI’s nonprofit parent a stake in the for-profit worth $130 billion, with the ability to get more ownership as the for-profit becomes more valuable.
-
-The deal ends a nearly year of wrangling with the attorneys general of California and Delaware, who have the power to regulate nonprofits, as well as with the broader philanthropic community and key investors over the question of whether the AI juggernaut could remain true to its mission while transforming into a more conventional company.
+test
