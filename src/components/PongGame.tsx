@@ -16,14 +16,24 @@ interface GameState {
 }
 
 export function PongGame() {
+  // Game constants
+  const CANVAS_WIDTH = 800;
+  const CANVAS_HEIGHT = 600;
+  const PADDLE_WIDTH = 10;
+  const PADDLE_HEIGHT = 100;
+  const BALL_SIZE = 10;
+  const PADDLE_SPEED = 6;
+  const WINNING_SCORE = 5;
+  const PADDLE_INFLUENCE_FACTOR = 10;
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState>({
-    ballX: 400,
-    ballY: 300,
+    ballX: CANVAS_WIDTH / 2,
+    ballY: CANVAS_HEIGHT / 2,
     ballSpeedX: 5,
     ballSpeedY: 5,
-    paddle1Y: 250,
-    paddle2Y: 250,
+    paddle1Y: (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2,
+    paddle2Y: (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2,
     score1: 0,
     score2: 0,
     isPlaying: false,
@@ -32,14 +42,6 @@ export function PongGame() {
 
   const keysPressed = useRef<Set<string>>(new Set());
   const animationFrameId = useRef<number>();
-
-  const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 600;
-  const PADDLE_WIDTH = 10;
-  const PADDLE_HEIGHT = 100;
-  const BALL_SIZE = 10;
-  const PADDLE_SPEED = 6;
-  const WINNING_SCORE = 5;
 
   const resetBall = useCallback(() => {
     return {
@@ -74,8 +76,8 @@ export function PongGame() {
       ballY: CANVAS_HEIGHT / 2,
       ballSpeedX: 5,
       ballSpeedY: 5,
-      paddle1Y: 250,
-      paddle2Y: 250,
+      paddle1Y: (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2,
+      paddle2Y: (CANVAS_HEIGHT - PADDLE_HEIGHT) / 2,
       score1: 0,
       score2: 0,
       isPlaying: false,
@@ -161,7 +163,7 @@ export function PongGame() {
           newBallX = PADDLE_WIDTH;
           // Add angle based on where ball hits paddle
           const hitPos = (newBallY - newPaddle1Y) / PADDLE_HEIGHT - 0.5;
-          newBallSpeedY = hitPos * 10;
+          newBallSpeedY = hitPos * PADDLE_INFLUENCE_FACTOR;
         }
 
         // Right paddle (Player 2)
@@ -174,7 +176,7 @@ export function PongGame() {
           newBallX = CANVAS_WIDTH - PADDLE_WIDTH - BALL_SIZE;
           // Add angle based on where ball hits paddle
           const hitPos = (newBallY - newPaddle2Y) / PADDLE_HEIGHT - 0.5;
-          newBallSpeedY = hitPos * 10;
+          newBallSpeedY = hitPos * PADDLE_INFLUENCE_FACTOR;
         }
 
         // Ball goes out of bounds (scoring)
