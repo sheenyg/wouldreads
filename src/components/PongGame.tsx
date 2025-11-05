@@ -48,7 +48,7 @@ export function PongGame() {
       ballSpeedX: 5 * (Math.random() > 0.5 ? 1 : -1),
       ballSpeedY: 5 * (Math.random() > 0.5 ? 1 : -1),
     };
-  }, [CANVAS_WIDTH, CANVAS_HEIGHT]);
+  }, []);
 
   const startGame = () => {
     setGameState((prev) => ({
@@ -197,13 +197,65 @@ export function PongGame() {
 
         // Check for winner
         if (newScore1 >= WINNING_SCORE || newScore2 >= WINNING_SCORE) {
+          // Render final state before stopping
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([10, 10]);
+          ctx.beginPath();
+          ctx.moveTo(CANVAS_WIDTH / 2, 0);
+          ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(0, newPaddle1Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+          ctx.fillRect(CANVAS_WIDTH - PADDLE_WIDTH, newPaddle2Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+          ctx.fillRect(newBallX, newBallY, BALL_SIZE, BALL_SIZE);
+          ctx.font = '48px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(newScore1.toString(), CANVAS_WIDTH / 4, 60);
+          ctx.fillText(newScore2.toString(), (CANVAS_WIDTH * 3) / 4, 60);
+
           return {
             ...prev,
+            ballX: newBallX,
+            ballY: newBallY,
+            paddle1Y: newPaddle1Y,
+            paddle2Y: newPaddle2Y,
             score1: newScore1,
             score2: newScore2,
             isPlaying: false,
           };
         }
+
+        // Render
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+        // Draw center line
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([10, 10]);
+        ctx.beginPath();
+        ctx.moveTo(CANVAS_WIDTH / 2, 0);
+        ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Draw paddles
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, newPaddle1Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+        ctx.fillRect(CANVAS_WIDTH - PADDLE_WIDTH, newPaddle2Y, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+        // Draw ball
+        ctx.fillRect(newBallX, newBallY, BALL_SIZE, BALL_SIZE);
+
+        // Draw scores
+        ctx.font = '48px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(newScore1.toString(), CANVAS_WIDTH / 4, 60);
+        ctx.fillText(newScore2.toString(), (CANVAS_WIDTH * 3) / 4, 60);
 
         return {
           ...prev,
@@ -218,34 +270,6 @@ export function PongGame() {
         };
       });
 
-      // Render
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-      // Draw center line
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([10, 10]);
-      ctx.beginPath();
-      ctx.moveTo(CANVAS_WIDTH / 2, 0);
-      ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Draw paddles
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0, gameState.paddle1Y, PADDLE_WIDTH, PADDLE_HEIGHT);
-      ctx.fillRect(CANVAS_WIDTH - PADDLE_WIDTH, gameState.paddle2Y, PADDLE_WIDTH, PADDLE_HEIGHT);
-
-      // Draw ball
-      ctx.fillRect(gameState.ballX, gameState.ballY, BALL_SIZE, BALL_SIZE);
-
-      // Draw scores
-      ctx.font = '48px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(gameState.score1.toString(), CANVAS_WIDTH / 4, 60);
-      ctx.fillText(gameState.score2.toString(), (CANVAS_WIDTH * 3) / 4, 60);
-
       animationFrameId.current = requestAnimationFrame(gameLoop);
     };
 
@@ -256,7 +280,7 @@ export function PongGame() {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [gameState.isPlaying, gameState.isPaused, gameState.paddle1Y, gameState.paddle2Y, gameState.ballX, gameState.ballY, gameState.score1, gameState.score2, resetBall, CANVAS_WIDTH, CANVAS_HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, BALL_SIZE, PADDLE_SPEED, WINNING_SCORE]);
+  }, [gameState.isPlaying, gameState.isPaused, resetBall]);
 
   const getGameStatus = () => {
     if (!gameState.isPlaying && (gameState.score1 >= WINNING_SCORE || gameState.score2 >= WINNING_SCORE)) {
