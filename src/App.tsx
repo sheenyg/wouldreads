@@ -6,7 +6,8 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { RefreshCw, Calendar, Newspaper } from "@phosphor-icons/react"
+import { PongGame } from "@/components/PongGame"
+import { RefreshCw, Calendar, Newspaper, GameController } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -17,6 +18,7 @@ function App() {
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
   const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
+  const [showPong, setShowPong] = useState(false)
 
   const todayKey = getDateKey()
 
@@ -165,14 +167,43 @@ function App() {
   const activeSources = sources.filter(s => s.isActive)
   const isToday = lastFetchDate === todayKey
 
+  // If showing Pong game, render it instead of the main app
+  if (showPong) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Toaster />
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-4">
+            <Button onClick={() => setShowPong(false)} variant="outline">
+              <Newspaper className="w-4 h-4 mr-2" />
+              Back to News
+            </Button>
+          </div>
+          <PongGame />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <header className="text-center mb-8">
-          <h1 className="font-display font-bold text-4xl mb-2 text-primary">
-            wouldreads
-          </h1>
+          <div className="flex justify-center items-center gap-4 mb-4">
+            <h1 className="font-display font-bold text-4xl text-primary">
+              wouldreads
+            </h1>
+            <Button
+              onClick={() => setShowPong(true)}
+              variant="outline"
+              size="sm"
+              className="ml-4"
+            >
+              <GameController className="w-4 h-4 mr-2" />
+              Play Pong
+            </Button>
+          </div>
           <p className="text-muted-foreground text-lg">
             Automatic article recommendations from my favorite tech + culture news sources
           </p>
