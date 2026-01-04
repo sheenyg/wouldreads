@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import { useKV } from '@github/spark/hooks'
+import { useKV } from '@/hooks/useKV'
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { RefreshCw, Calendar, Newspaper } from "@phosphor-icons/react"
+import { ArrowClockwise, Calendar, Newspaper } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -193,7 +193,7 @@ function App() {
                   onClick={refreshArticles}
                   disabled={isLoading}
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh Articles
                 </Button>
 
@@ -265,7 +265,7 @@ function App() {
                     Your sources are configured. Click refresh to get today's articles.
                   </p>
                   <Button onClick={refreshArticles} disabled={isLoading}>
-                    <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                     Get Today's Articles
                   </Button>
                 </div>
