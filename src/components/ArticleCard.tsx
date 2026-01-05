@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowSquareOut, Check, ArrowCounterClockwise, Star, StarFill } from "@phosphor-icons/react"
+import { ArrowSquareOut, Check, ArrowCounterClockwise, Star } from "@phosphor-icons/react"
 import { Article } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -44,7 +44,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
                 className="hover:bg-yellow-50 hover:text-yellow-600"
               >
                 {article.isStarred ? (
-                  <StarFill className="w-5 h-5 text-yellow-500" weight="fill" />
+                  <Star className="w-5 h-5 text-yellow-500" weight="fill" />
                 ) : (
                   <Star className="w-5 h-5" />
                 )}
