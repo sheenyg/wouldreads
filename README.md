@@ -6,7 +6,7 @@ You can try out the live app here: [https://daily-digest-aggrega--sheenyg.github
 
 ## About
 
-Wouldreads is currently at **version 1.0**. The app collects news articles from various sources, presenting them in a clean, easy-to-digest format for your daily reading.
+Wouldreads is currently at **version 1.1**. The app collects news articles from various sources, presenting them in a clean, easy-to-digest format for your daily reading.
 
 ---
 
