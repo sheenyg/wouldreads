@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { ArrowClockwise, Calendar, Newspaper } from "@phosphor-icons/react"
+import { ArrowClockwise, Calendar, Newspaper, Star } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -14,9 +14,11 @@ import { toast, Toaster } from "sonner"
 function App() {
   const [sources, setSources] = useKV<NewsSource[]>("news-sources", [])
   const [articles, setArticles] = useKV<Article[]>("daily-articles", [])
+  const [starredArticles, setStarredArticles] = useKV<Article[]>("starred-articles", [])
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
   const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
+  const [currentView, setCurrentView] = useState<"today" | "starred">("today")
 
   const todayKey = getDateKey()
 
@@ -153,6 +155,44 @@ function App() {
         article.id === articleId ? { ...article, isRead: !article.isRead } : article
       )
     )
+    // Also update in starred articles if it exists there
+    setStarredArticles((current) => 
+      current.map(article => 
+        article.id === articleId ? { ...article, isRead: !article.isRead } : article
+      )
+    )
+  }
+
+  const toggleArticleStar = (articleId: string) => {
+    // Find the article in either daily articles or starred articles
+    const dailyArticle = articles.find(a => a.id === articleId)
+    const starredArticle = starredArticles.find(a => a.id === articleId)
+    const article = dailyArticle || starredArticle
+
+    if (!article) return
+
+    if (article.isStarred) {
+      // Unstar: remove from starred articles
+      setStarredArticles((current) => current.filter(a => a.id !== articleId))
+      // Update isStarred in daily articles
+      setArticles((current) => 
+        current.map(a => 
+          a.id === articleId ? { ...a, isStarred: false } : a
+        )
+      )
+      toast.success("Article removed from starred")
+    } else {
+      // Star: add to starred articles
+      const updatedArticle = { ...article, isStarred: true }
+      setStarredArticles((current) => [...current, updatedArticle])
+      // Update isStarred in daily articles
+      setArticles((current) => 
+        current.map(a => 
+          a.id === articleId ? { ...a, isStarred: true } : a
+        )
+      )
+      toast.success("Article added to starred")
+    }
   }
 
   const activateAllSources = () => {
@@ -229,67 +269,126 @@ function App() {
 
             <Separator className="mb-8" />
 
+            {/* View Navigation */}
+            <div className="flex justify-center gap-2 mb-6">
+              <Button
+                variant={currentView === "today" ? "default" : "outline"}
+                onClick={() => setCurrentView("today")}
+              >
+                <Newspaper className="w-4 h-4 mr-2" />
+                Today's Articles
+              </Button>
+              <Button
+                variant={currentView === "starred" ? "default" : "outline"}
+                onClick={() => setCurrentView("starred")}
+              >
+                <Star className="w-4 h-4 mr-2" />
+                Starred Articles ({starredArticles.length})
+              </Button>
+            </div>
+
             <main>
-              {sources.length === 0 ? (
-                <div className="text-center py-12">
-                  <h2 className="font-display text-2xl mb-4">Welcome to wouldreads</h2>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Get started by adding news sources. We'll curate 50 quality articles 
-                    for you each day from your trusted sources.
-                  </p>
-                  <SourceManager
-                    sources={sources}
-                    onAddSource={addSource}
-                    onRemoveSource={removeSource}
-                    onToggleSource={toggleSource}
-                  />
-                </div>
-              ) : activeSources.length === 0 ? (
-                <div className="text-center py-12">
-                  <h2 className="font-display text-2xl mb-4">No Active Sources</h2>
-                  <p className="text-muted-foreground mb-6">
-                    You have news sources configured, but none are currently active. 
-                    Activate some sources to start getting articles.
-                  </p>
-                  <SourceManager
-                    sources={sources}
-                    onAddSource={addSource}
-                    onRemoveSource={removeSource}
-                    onToggleSource={toggleSource}
-                  />
-                </div>
-              ) : articles.length === 0 ? (
-                <div className="text-center py-12">
-                  <h2 className="font-display text-2xl mb-4">Ready to Curate</h2>
-                  <p className="text-muted-foreground mb-6">
-                    Your sources are configured. Click refresh to get today's articles.
-                  </p>
-                  <Button onClick={refreshArticles} disabled={isLoading}>
-                    <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                    Get Today's Articles
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <h2 className="font-display text-2xl mb-2">
-                      {isToday ? "Today's Curated Articles" : "Latest Articles"}
-                    </h2>
-                    <p className="text-muted-foreground">
-                      {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
+              {currentView === "starred" ? (
+                // Starred Articles View
+                starredArticles.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <h2 className="font-display text-2xl mb-4">No Starred Articles Yet</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                      Star articles to save them for later! Click the star icon on any article to add it to your starred collection.
                     </p>
+                    <Button onClick={() => setCurrentView("today")} variant="outline">
+                      <Newspaper className="w-4 h-4 mr-2" />
+                      View Today's Articles
+                    </Button>
                   </div>
-                  
-                  <div className="grid gap-6">
-                    {articles.map((article) => (
-                      <ArticleCard
-                        key={article.id}
-                        article={article}
-                        onToggleRead={toggleArticleRead}
-                      />
-                    ))}
+                ) : (
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h2 className="font-display text-2xl mb-2">
+                        Your Starred Articles
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {starredArticles.filter(a => a.isRead).length} of {starredArticles.length} starred articles read
+                      </p>
+                    </div>
+                    
+                    <div className="grid gap-6">
+                      {starredArticles.map((article) => (
+                        <ArticleCard
+                          key={article.id}
+                          article={article}
+                          onToggleRead={toggleArticleRead}
+                          onToggleStar={toggleArticleStar}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )
+              ) : (
+                // Today's Articles View
+                sources.length === 0 ? (
+                  <div className="text-center py-12">
+                    <h2 className="font-display text-2xl mb-4">Welcome to wouldreads</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                      Get started by adding news sources. We'll curate 50 quality articles 
+                      for you each day from your trusted sources.
+                    </p>
+                    <SourceManager
+                      sources={sources}
+                      onAddSource={addSource}
+                      onRemoveSource={removeSource}
+                      onToggleSource={toggleSource}
+                    />
+                  </div>
+                ) : activeSources.length === 0 ? (
+                  <div className="text-center py-12">
+                    <h2 className="font-display text-2xl mb-4">No Active Sources</h2>
+                    <p className="text-muted-foreground mb-6">
+                      You have news sources configured, but none are currently active. 
+                      Activate some sources to start getting articles.
+                    </p>
+                    <SourceManager
+                      sources={sources}
+                      onAddSource={addSource}
+                      onRemoveSource={removeSource}
+                      onToggleSource={toggleSource}
+                    />
+                  </div>
+                ) : articles.length === 0 ? (
+                  <div className="text-center py-12">
+                    <h2 className="font-display text-2xl mb-4">Ready to Curate</h2>
+                    <p className="text-muted-foreground mb-6">
+                      Your sources are configured. Click refresh to get today's articles.
+                    </p>
+                    <Button onClick={refreshArticles} disabled={isLoading}>
+                      <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                      Get Today's Articles
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h2 className="font-display text-2xl mb-2">
+                        {isToday ? "Today's Curated Articles" : "Latest Articles"}
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
+                      </p>
+                    </div>
+                    
+                    <div className="grid gap-6">
+                      {articles.map((article) => (
+                        <ArticleCard
+                          key={article.id}
+                          article={article}
+                          onToggleRead={toggleArticleRead}
+                          onToggleStar={toggleArticleStar}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )
               )}
             </main>
         </div>

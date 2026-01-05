@@ -1,16 +1,17 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowSquareOut, Check, ArrowCounterClockwise } from "@phosphor-icons/react"
+import { ArrowSquareOut, Check, ArrowCounterClockwise, Star, StarFill } from "@phosphor-icons/react"
 import { Article } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 interface ArticleCardProps {
   article: Article
   onToggleRead: (id: string) => void
+  onToggleStar?: (id: string) => void
 }
 
-export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
+export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCardProps) {
   return (
     <Card className={cn(
       "transition-all duration-200 hover:shadow-lg border-2",
@@ -34,24 +35,39 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
               </span>
             </div>
           </div>
-          <Button
-            variant={article.isRead ? "outline" : "default"}
-            size="sm"
-            onClick={() => onToggleRead(article.id)}
-            className="shrink-0"
-          >
-            {article.isRead ? (
-              <>
-                <ArrowCounterClockwise className="w-4 h-4 mr-1" />
-                Mark Unread
-              </>
-            ) : (
-              <>
-                <Check className="w-4 h-4 mr-1" />
-                Mark Read
-              </>
+          <div className="flex items-center gap-2 shrink-0">
+            {onToggleStar && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onToggleStar(article.id)}
+                className="hover:bg-yellow-50 hover:text-yellow-600"
+              >
+                {article.isStarred ? (
+                  <StarFill className="w-5 h-5 text-yellow-500" weight="fill" />
+                ) : (
+                  <Star className="w-5 h-5" />
+                )}
+              </Button>
             )}
-          </Button>
+            <Button
+              variant={article.isRead ? "outline" : "default"}
+              size="sm"
+              onClick={() => onToggleRead(article.id)}
+            >
+              {article.isRead ? (
+                <>
+                  <ArrowCounterClockwise className="w-4 h-4 mr-1" />
+                  Mark Unread
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4 mr-1" />
+                  Mark Read
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
