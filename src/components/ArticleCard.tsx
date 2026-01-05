@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Check, RotateCcw } from "@phosphor-icons/react"
+import { ArrowSquareOut, Check, ArrowCounterClockwise } from "@phosphor-icons/react"
 import { Article } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -42,7 +42,7 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
           >
             {article.isRead ? (
               <>
-                <RotateCcw className="w-4 h-4 mr-1" />
+                <ArrowCounterClockwise className="w-4 h-4 mr-1" />
                 Mark Unread
               </>
             ) : (
@@ -74,7 +74,7 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center"
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
+            <ArrowSquareOut className="w-4 h-4 mr-2" />
             Read Full Article
           </a>
         </Button>
