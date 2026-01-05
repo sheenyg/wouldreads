@@ -11,11 +11,22 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
+  const handleCardClick = () => {
+    window.open(article.url, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent card click when clicking buttons
+  }
+
   return (
-    <Card className={cn(
-      "transition-all duration-200 hover:shadow-lg border-2",
-      article.isRead ? "opacity-75 border-muted" : "border-primary/20 hover:border-primary/40"
-    )}>
+    <Card 
+      className={cn(
+        "transition-all duration-200 hover: shadow-lg border-2 cursor-pointer",
+        article. isRead ?  "opacity-75 border-muted" : "border-primary/20 hover:border-primary/40"
+      )}
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -27,17 +38,20 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
             </h2>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-xs">
-                {article.source}
+                {article. source}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                {new Date(article.publishedAt).toLocaleDateString()}
+                {new Date(article. publishedAt).toLocaleDateString()}
               </span>
             </div>
           </div>
           <Button
             variant={article.isRead ? "outline" : "default"}
             size="sm"
-            onClick={() => onToggleRead(article.id)}
+            onClick={(e) => {
+              handleButtonClick(e)
+              onToggleRead(article.id)
+            }}
             className="shrink-0"
           >
             {article.isRead ? (
@@ -57,7 +71,7 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
       <CardContent>
         <p className={cn(
           "text-sm leading-relaxed mb-4",
-          article.isRead ? "text-muted-foreground" : "text-foreground"
+          article.isRead ?  "text-muted-foreground" : "text-foreground"
         )}>
           {article.summary}
         </p>
@@ -66,7 +80,10 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
           size="sm"
           asChild
           className="hover:bg-accent hover:text-accent-foreground"
-          onClick={() => !article.isRead && onToggleRead(article.id)}
+          onClick={(e) => {
+            handleButtonClick(e)
+            if (! article.isRead) onToggleRead(article.id)
+          }}
         >
           <a 
             href={article.url} 
