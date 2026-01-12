@@ -66,24 +66,7 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
                 Mark Read
               </>
             )}
-            <Button
-              variant={article.isRead ? "outline" : "default"}
-              size="sm"
-              onClick={() => onToggleRead(article.id)}
-            >
-              {article.isRead ? (
-                <>
-                  <ArrowCounterClockwise className="w-4 h-4 mr-1" />
-                  Mark Unread
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4 mr-1" />
-                  Mark Read
-                </>
-              )}
-            </Button>
-          </div>
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
