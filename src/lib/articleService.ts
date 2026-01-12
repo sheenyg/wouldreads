@@ -127,7 +127,8 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
             url: item.link || item.guid || '#',
             source: source.name,
             publishedAt: item.pubDate || new Date().toISOString(),
-            isRead: false
+            isRead: false,
+            isStarred: false
           }))
         } else {
           // allorigins format - need to parse XML manually
@@ -158,7 +159,8 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
               url: link,
               source: source.name,
               publishedAt: pubDate,
-              isRead: false
+              isRead: false,
+              isStarred: false
             }
           })
         }
@@ -288,7 +290,8 @@ export function generateMockArticles(sources: NewsSource[]): Article[] {
       url: `https://example.com/article/${Date.now() + index}`,
       source: source.name,
       publishedAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
-      isRead: false
+      isRead: false,
+      isStarred: false
     })
   })
   
@@ -305,7 +308,8 @@ export function generateMockArticles(sources: NewsSource[]): Article[] {
       url: `https://example.com/article/${Date.now() + availableSources.length + i}`,
       source: availableSources[sourceIndex].name,
       publishedAt: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
-      isRead: false
+      isRead: false,
+      isStarred: false
     })
   }
 
