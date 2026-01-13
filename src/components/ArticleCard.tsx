@@ -11,7 +11,7 @@ interface ArticleCardProps {
   onToggleStar?: (id: string) => void
 }
 
-export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
+export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCardProps) {
   const handleCardClick = () => {
     window.open(article.url, '_blank', 'noopener,noreferrer')
   }
@@ -31,6 +31,24 @@ export function ArticleCard({ article, onToggleRead }: ArticleCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
+            {onToggleStar && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  handleButtonClick(e)
+                  onToggleStar(article.id)
+                }}
+                className="mb-2 -ml-2 h-8 w-8 p-0 hover:bg-accent"
+                aria-label={article.isStarred ? "Unstar article" : "Star article"}
+              >
+                <Star 
+                  className="w-5 h-5" 
+                  weight={article.isStarred ? "fill" : "regular"}
+                  color={article.isStarred ? undefined : "#d1d5db"}
+                />
+              </Button>
+            )}
             <h2 className={cn(
               "font-display font-semibold text-xl leading-tight mb-2",
               article.isRead && "text-muted-foreground"
