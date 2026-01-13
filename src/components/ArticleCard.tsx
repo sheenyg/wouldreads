@@ -45,6 +45,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
                 <Star 
                   className="w-5 h-5" 
                   weight={article.isStarred ? "fill" : "regular"}
+                  color={article.isStarred ? undefined : "#d1d5db"}
                 />
               </Button>
             )}
