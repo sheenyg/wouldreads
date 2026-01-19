@@ -81,7 +81,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
             ) : (
               <>
                 <Check className="w-4 h-4 mr-1" />
-                Mark Read
+                I've read this article
               </>
             )}
           </Button>
