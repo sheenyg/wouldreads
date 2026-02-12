@@ -43,20 +43,18 @@ export function ArticleStatsChart({ articles }: ArticleStatsChartProps) {
   } satisfies ChartConfig
 
   // Calculate articles by source
-  const sourceStats = articles.reduce((acc, article) => {
-    const existing = acc.find(s => s.source === article.source)
-    if (existing) {
-      existing.total++
-      if (article.isRead) existing.read++
-    } else {
-      acc.push({
-        source: article.source,
-        total: 1,
-        read: article.isRead ? 1 : 0
-      })
+  const sourceStatsMap = articles.reduce((acc, article) => {
+    if (!acc[article.source]) {
+      acc[article.source] = { source: article.source, total: 0, read: 0 }
+    }
+    acc[article.source].total++
+    if (article.isRead) {
+      acc[article.source].read++
     }
     return acc
-  }, [] as Array<{ source: string; total: number; read: number }>)
+  }, {} as Record<string, { source: string; total: number; read: number }>)
+  
+  const sourceStats = Object.values(sourceStatsMap)
 
   const sourceChartConfig = {
     total: {
