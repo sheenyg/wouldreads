@@ -7,6 +7,13 @@ interface ArticleStatsChartProps {
   articles: Article[]
 }
 
+// Chart color constants for consistency across charts
+const CHART_COLORS = {
+  primary: "hsl(var(--primary))",
+  accent: "hsl(var(--accent))",
+  muted: "hsl(var(--muted-foreground))",
+} as const
+
 export function ArticleStatsChart({ articles }: ArticleStatsChartProps) {
   if (articles.length === 0) {
     return null
@@ -27,11 +34,11 @@ export function ArticleStatsChart({ articles }: ArticleStatsChartProps) {
     },
     read: {
       label: "Read",
-      color: "oklch(0.4 0.15 240)",
+      color: CHART_COLORS.primary,
     },
     unread: {
       label: "Unread",
-      color: "oklch(0.5 0.05 240)",
+      color: CHART_COLORS.muted,
     },
   } satisfies ChartConfig
 
@@ -54,11 +61,11 @@ export function ArticleStatsChart({ articles }: ArticleStatsChartProps) {
   const sourceChartConfig = {
     total: {
       label: "Total Articles",
-      color: "oklch(0.4 0.15 240)",
+      color: CHART_COLORS.primary,
     },
     read: {
       label: "Read",
-      color: "oklch(0.7 0.15 40)",
+      color: CHART_COLORS.accent,
     },
   } satisfies ChartConfig
 
