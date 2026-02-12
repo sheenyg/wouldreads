@@ -31,6 +31,24 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
+            {onToggleStar && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  handleButtonClick(e)
+                  onToggleStar(article.id)
+                }}
+                className="mb-2 -ml-2 h-8 w-8 p-0 hover:bg-accent"
+                aria-label={article.isStarred ? "Unstar article" : "Star article"}
+              >
+                <Star 
+                  className="w-5 h-5" 
+                  weight={article.isStarred ? "fill" : "regular"}
+                  color={article.isStarred ? undefined : "#d1d5db"}
+                />
+              </Button>
+            )}
             <h2 className={cn(
               "font-display font-semibold text-xl leading-tight mb-2",
               article.isRead && "text-muted-foreground"
@@ -46,46 +64,27 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              variant={article.isRead ? "outline" : "default"}
-              size="sm"
-              onClick={(e) => {
-                handleButtonClick(e)
-                onToggleRead(article.id)
-              }}
-            >
-              {article.isRead ? (
-                <>
-                  <ArrowCounterClockwise className="w-4 h-4 mr-1" />
-                  Mark Unread
-                </>
-              ) : (
-                <>
-                  <Check className="w-4 h-4 mr-1" />
-                  I've read this article
-                </>
-              )}
-            </Button>
-            {onToggleStar && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  handleButtonClick(e)
-                  onToggleStar(article.id)
-                }}
-                className="h-8 w-8 p-0 hover:bg-accent-secondary-3"
-                aria-label={article.isStarred ? "Unstar article" : "Star article"}
-              >
-                <Star 
-                  className="w-5 h-5" 
-                  weight={article.isStarred ? "fill" : "regular"}
-                  color={article.isStarred ? undefined : "#d1d5db"}
-                />
-              </Button>
+          <Button
+            variant={article.isRead ? "outline" : "default"}
+            size="sm"
+            onClick={(e) => {
+              handleButtonClick(e)
+              onToggleRead(article.id)
+            }}
+            className="shrink-0"
+          >
+            {article.isRead ? (
+              <>
+                <ArrowCounterClockwise className="w-4 h-4 mr-1" />
+                Mark Unread
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 mr-1" />
+                Mark Read
+              </>
             )}
-          </div>
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
