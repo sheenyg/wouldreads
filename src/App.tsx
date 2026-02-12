@@ -6,7 +6,8 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { ArrowClockwise, Calendar, Newspaper, Star } from "@phosphor-icons/react"
+import { StatisticsChart } from "@/components/StatisticsChart"
+import { ArrowClockwise, Calendar, Newspaper, Star, ChartBar } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -18,7 +19,7 @@ function App() {
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
   const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
-  const [currentView, setCurrentView] = useState<"today" | "starred">("today")
+  const [currentView, setCurrentView] = useState<"today" | "starred" | "stats">("today")
 
   const todayKey = getDateKey()
 
@@ -285,10 +286,30 @@ function App() {
                 <Star className="w-4 h-4 mr-2" />
                 Starred Articles ({starredArticles.length})
               </Button>
+              <Button
+                variant={currentView === "stats" ? "default" : "outline"}
+                onClick={() => setCurrentView("stats")}
+              >
+                <ChartBar className="w-4 h-4 mr-2" />
+                Statistics
+              </Button>
             </div>
 
             <main>
-              {currentView === "starred" ? (
+              {currentView === "stats" ? (
+                // Statistics View
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h2 className="font-display text-2xl mb-2">
+                      Content Type Statistics
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Distribution of content types across the platform
+                    </p>
+                  </div>
+                  <StatisticsChart />
+                </div>
+              ) : currentView === "starred" ? (
                 // Starred Articles View
                 starredArticles.length === 0 ? (
                   <div className="text-center py-12">
