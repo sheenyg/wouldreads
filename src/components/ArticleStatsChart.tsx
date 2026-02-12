@@ -19,9 +19,18 @@ export function ArticleStatsChart({ articles }: ArticleStatsChartProps) {
     return null
   }
 
-  // Calculate read vs unread stats
-  const readCount = articles.filter(a => a.isRead).length
-  const unreadCount = articles.filter(a => !a.isRead).length
+  // Calculate read vs unread stats in a single pass
+  const { readCount, unreadCount } = articles.reduce(
+    (acc, article) => {
+      if (article.isRead) {
+        acc.readCount++
+      } else {
+        acc.unreadCount++
+      }
+      return acc
+    },
+    { readCount: 0, unreadCount: 0 }
+  )
   
   const readStats = [
     { status: 'read', value: readCount, fill: 'var(--color-read)' },
