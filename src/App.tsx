@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
+import { ArticleStatsChart } from "@/components/ArticleStatsChart"
 import { SourceManager } from "@/components/SourceManager"
 import { ArrowClockwise, Calendar, Newspaper, Star } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
@@ -313,6 +314,9 @@ function App() {
                       </p>
                     </div>
                     
+                    {/* Chart for Starred Articles */}
+                    <ArticleStatsChart articles={starredArticles} />
+                    
                     <div className="grid gap-6">
                       {starredArticles.map((article) => (
                         <ArticleCard
@@ -376,6 +380,9 @@ function App() {
                         {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
                       </p>
                     </div>
+                    
+                    {/* Chart for Today's Articles */}
+                    <ArticleStatsChart articles={articles} />
                     
                     <div className="grid gap-6">
                       {articles.map((article) => (
