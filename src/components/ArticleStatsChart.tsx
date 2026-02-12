@@ -1,5 +1,5 @@
 import { Article } from "@/lib/types"
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
+import { BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Label } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartConfig } from "@/components/ui/chart"
 
