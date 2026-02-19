@@ -10,6 +10,18 @@ Wouldreads is currently at **version 1.1**. The app collects news articles from 
 
 ---
 
+## Latest AI News *(February 19, 2026)*
+
+**Major Global Event: The AI Impact Summit 2026 in Delhi**
+
+- The AI Impact Summit is currently happening in New Delhi, marking the first time the event is hosted in the Global South.
+- At this summit, the **"Delhi Declaration"**—dubbed the *'Magna Carta' of AI*—is being formally adopted. This new global governance framework focuses on development, equity, and "techno-legal" principles rather than rigid compliance rules.
+- The Declaration emphasizes trust, human dignity, innovation, fairness, accountability, transparency, and sustainability in AI deployment. It explicitly aims to end *'AI extractivism'*, where developing nations' data is used for training models they must later buy. Data sovereignty and domestic AI ecosystems are prioritized.
+- There are substantial financial commitments: **Jio (Reliance)** announced a ₹10 lakh crore (~₹10 trillion) investment in AI over seven years, with industry leaders like Mukesh Ambani and Sundar Pichai predicting India will be a global AI powerhouse.
+- **OpenAI CEO Sam Altman** stated the cost of AI is expected to fall dramatically, enabling broader access and innovation.
+
+---
+
 ## Contributing
 
 Feel free to **fork** this repository and create your own version of Wouldreads!
