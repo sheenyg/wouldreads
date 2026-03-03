@@ -60,6 +60,12 @@ function App() {
           name: "Semafor",
           url: "https://www.semafor.com/feed",
           isActive: true
+        },
+        {
+          id: "7",
+          name: "CNN",
+          url: "https://rss.cnn.com/rss/edition.rss",
+          isActive: true
         }
       ]
       setSources(defaultSources)
