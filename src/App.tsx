@@ -209,11 +209,11 @@ function App() {
     <div className="min-h-screen bg-background">
       <Toaster />
       <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl">
-        <header className="text-center mb-8">
-          <h1 className="font-display font-bold text-2xl sm:text-4xl mb-2 text-primary">
+        <header className="mb-8">
+          <h1 className="font-display font-bold text-2xl sm:text-4xl mb-2 text-primary text-center">
             sheenyg's wouldreads
           </h1>
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg text-center">
             Automatic article recommendations from my favorite tech + culture news sources
           </p>
         </header>
