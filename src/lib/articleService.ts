@@ -25,16 +25,21 @@ export async function fetchArticlesFromSources(sources: NewsSource[]): Promise<A
 
   const articlesBySource: { [sourceId: string]: Article[] } = {}
   
-  // Fetch articles from each source
-  for (const source of activeSources) {
-    try {
+  // Fetch articles from all sources in parallel
+  const results = await Promise.allSettled(
+    activeSources.map(source => {
       console.log(`Fetching from ${source.name}: ${source.url}`)
-      const articles = await fetchArticlesFromRSS(source)
-      console.log(`Successfully fetched ${articles.length} articles from ${source.name}`)
-      articlesBySource[source.id] = articles
-    } catch (error) {
-      console.error(`Failed to fetch from ${source.name} (${source.url}):`, error)
-      // Continue with other sources even if one fails
+      return fetchArticlesFromRSS(source)
+    })
+  )
+
+  for (const [index, result] of results.entries()) {
+    const source = activeSources[index]
+    if (result.status === 'fulfilled') {
+      console.log(`Successfully fetched ${result.value.length} articles from ${source.name}`)
+      articlesBySource[source.id] = result.value
+    } else {
+      console.error(`Failed to fetch from ${source.name} (${source.url}):`, result.reason)
     }
   }
 
