@@ -29,41 +29,49 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
       onClick={handleCardClick}
     >
       <CardHeader className="pb-3">
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex-1">
-            {onToggleStar && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  handleButtonClick(e)
-                  onToggleStar(article.id)
-                }}
-                className="mb-2 -ml-2 h-10 w-10 p-0 hover:bg-accent"
-                aria-label={article.isStarred ? "Unstar article" : "Star article"}
-              >
-                <Star 
-                  className="w-5 h-5" 
-                  weight={article.isStarred ? "fill" : "regular"}
-                  color={article.isStarred ? undefined : "#d1d5db"}
-                />
-              </Button>
-            )}
-            <h2 className={cn(
-              "font-display font-semibold text-xl leading-tight mb-2",
-              article.isRead && "text-muted-foreground"
-            )}>
-              {article.title}
-            </h2>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs">
-                {article. source}
-              </Badge>
-              <span className="text-xs text-muted-foreground">
-                {new Date(article. publishedAt).toLocaleDateString()}
-              </span>
-            </div>
+        <div>
+          {onToggleStar && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                handleButtonClick(e)
+                onToggleStar(article.id)
+              }}
+              className="mb-2 -ml-2 h-10 w-10 p-0 hover:bg-accent"
+              aria-label={article.isStarred ? "Unstar article" : "Star article"}
+            >
+              <Star 
+                className="w-5 h-5" 
+                weight={article.isStarred ? "fill" : "regular"}
+                color={article.isStarred ? undefined : "#d1d5db"}
+              />
+            </Button>
+          )}
+          <h2 className={cn(
+            "font-display font-semibold text-xl leading-tight mb-2",
+            article.isRead && "text-muted-foreground"
+          )}>
+            {article.title}
+          </h2>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              {article. source}
+            </Badge>
+            <span className="text-xs text-muted-foreground">
+              {new Date(article. publishedAt).toLocaleDateString()}
+            </span>
           </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className={cn(
+          "text-sm leading-relaxed mb-4",
+          article.isRead ?  "text-muted-foreground" : "text-foreground"
+        )}>
+          {article.summary}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             variant={article.isRead ? "outline" : "default"}
             size="sm"
@@ -71,7 +79,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
               handleButtonClick(e)
               onToggleRead(article.id)
             }}
-            className="shrink-0 w-full sm:w-auto"
+            className="w-full sm:w-auto"
           >
             {article.isRead ? (
               <>
@@ -85,35 +93,27 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
               </>
             )}
           </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className={cn(
-          "text-sm leading-relaxed mb-4",
-          article.isRead ?  "text-muted-foreground" : "text-foreground"
-        )}>
-          {article.summary}
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          asChild
-          className="w-full sm:w-auto hover:bg-accent hover:text-accent-foreground"
-          onClick={(e) => {
-            handleButtonClick(e)
-            if (! article.isRead) onToggleRead(article.id)
-          }}
-        >
-          <a 
-            href={article.url} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center"
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="w-full sm:w-auto hover:bg-accent hover:text-accent-foreground"
+            onClick={(e) => {
+              handleButtonClick(e)
+              if (! article.isRead) onToggleRead(article.id)
+            }}
           >
-            <ArrowSquareOut className="w-4 h-4 mr-2" />
-            Read Full Article
-          </a>
-        </Button>
+            <a 
+              href={article.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center"
+            >
+              <ArrowSquareOut className="w-4 h-4 mr-2" />
+              Read Full Article
+            </a>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )
