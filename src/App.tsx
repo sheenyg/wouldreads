@@ -211,7 +211,7 @@ function App() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <header className="text-center mb-8">
           <h1 className="font-display font-bold text-4xl mb-2 text-primary">
-            wouldreads
+            sheenyg's wouldreads
           </h1>
           <p className="text-muted-foreground text-lg">
             Automatic article recommendations from my favorite tech + culture news sources
