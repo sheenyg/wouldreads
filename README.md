@@ -2,11 +2,10 @@
 
 Welcome to **Wouldreads**, an article aggregator designed for effortless daily news consumption.  
 You can try out the live app here: [https://daily-digest-aggrega--sheenyg.github.app/](https://sheenyg.github.io/wouldreads/)
----
 
 ## About
 
-Wouldreads is currently at **version 1.1**. The app collects news articles from various sources, presenting them in a clean, easy-to-digest format for your daily reading.
+Wouldreads is currently at **version 1.1**. The app collects news articles from various sources, presenting them in a clean, easy-to-digest format for my daily reading.
 
 ---
 
