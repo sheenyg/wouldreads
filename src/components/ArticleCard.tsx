@@ -29,7 +29,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
       onClick={handleCardClick}
     >
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
             {onToggleStar && (
               <Button
@@ -39,7 +39,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
                   handleButtonClick(e)
                   onToggleStar(article.id)
                 }}
-                className="mb-2 -ml-2 h-8 w-8 p-0 hover:bg-accent"
+                className="mb-2 -ml-2 h-10 w-10 p-0 hover:bg-accent"
                 aria-label={article.isStarred ? "Unstar article" : "Star article"}
               >
                 <Star 
@@ -71,7 +71,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
               handleButtonClick(e)
               onToggleRead(article.id)
             }}
-            className="shrink-0"
+            className="shrink-0 w-full sm:w-auto"
           >
             {article.isRead ? (
               <>
@@ -98,7 +98,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
           variant="outline"
           size="sm"
           asChild
-          className="hover:bg-accent hover:text-accent-foreground"
+          className="w-full sm:w-auto hover:bg-accent hover:text-accent-foreground"
           onClick={(e) => {
             handleButtonClick(e)
             if (! article.isRead) onToggleRead(article.id)
@@ -108,7 +108,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
             href={article.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center"
+            className="inline-flex items-center justify-center"
           >
             <ArrowSquareOut className="w-4 h-4 mr-2" />
             Read Full Article

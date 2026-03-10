@@ -208,19 +208,19 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl">
         <header className="text-center mb-8">
-          <h1 className="font-display font-bold text-4xl mb-2 text-primary">
+          <h1 className="font-display font-bold text-2xl sm:text-4xl mb-2 text-primary">
             sheenyg's wouldreads
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Automatic article recommendations from my favorite tech + culture news sources
           </p>
         </header>
 
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center flex-wrap gap-3">
                 <SourceManager
                   sources={sources}
                   onAddSource={addSource}
