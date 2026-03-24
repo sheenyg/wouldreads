@@ -23,13 +23,13 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
   return (
     <Card 
       className={cn(
-        "transition-all duration-200 hover: shadow-lg border-2 cursor-pointer",
-        article. isRead ?  "opacity-75 border-muted" : "border-primary/20 hover:border-primary/40"
+        "transition-all duration-200 hover:shadow-lg border-2 cursor-pointer overflow-hidden",
+        article.isRead ? "opacity-75 border-muted" : "border-primary/20 hover:border-primary/40"
       )}
       onClick={handleCardClick}
     >
       <CardHeader className="pb-3">
-        <div>
+        <div className="min-w-0">
           {onToggleStar && (
             <Button
               variant="ghost"
@@ -49,25 +49,25 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
             </Button>
           )}
           <h2 className={cn(
-            "font-display font-semibold text-xl leading-tight mb-2",
+            "font-display font-semibold text-lg sm:text-xl leading-tight mb-2 break-words",
             article.isRead && "text-muted-foreground"
           )}>
             {article.title}
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary" className="text-xs">
-              {article. source}
+              {article.source}
             </Badge>
             <span className="text-xs text-muted-foreground">
-              {new Date(article. publishedAt).toLocaleDateString()}
+              {new Date(article.publishedAt).toLocaleDateString()}
             </span>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <p className={cn(
-          "text-sm leading-relaxed mb-4",
-          article.isRead ?  "text-muted-foreground" : "text-foreground"
+          "text-sm leading-relaxed mb-4 break-words",
+          article.isRead ? "text-muted-foreground" : "text-foreground"
         )}>
           {article.summary}
         </p>
@@ -100,7 +100,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
             className="w-full sm:w-auto hover:bg-accent hover:text-accent-foreground"
             onClick={(e) => {
               handleButtonClick(e)
-              if (! article.isRead) onToggleRead(article.id)
+              if (!article.isRead) onToggleRead(article.id)
             }}
           >
             <a 
