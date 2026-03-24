@@ -206,12 +206,12 @@ function App() {
   const isToday = lastFetchDate === todayKey
 
   return (
-    <div className="min-h-screen bg-background bg-[radial-gradient(1200px_circle_at_20%_-10%,rgba(99,102,241,0.18),transparent_55%),radial-gradient(900px_circle_at_90%_0%,rgba(236,72,153,0.12),transparent_45%)]">
+    <div className="min-h-screen bg-background">
       <Toaster />
       <div className="container mx-auto px-4 py-4 sm:py-8 max-w-4xl">
-        <header className="mb-8 sticky top-0 z-50 bg-background/70 backdrop-blur-md border-b border-border/60 shadow-sm shadow-black/5 dark:shadow-black/20 -mx-4 px-4 py-4">
-          <h1 className="font-display font-bold text-2xl sm:text-4xl mb-2 tracking-tight text-primary text-center">
-            Product manager based in New York City.
+        <header className="mb-8">
+          <h1 className="font-display font-bold text-2xl sm:text-4xl mb-2 text-primary text-center">
+            sheenyg's wouldreads
           </h1>
           <p className="text-muted-foreground text-base sm:text-lg text-center">
             Automatic article recommendations from my favorite tech + culture news sources
@@ -287,7 +287,7 @@ function App() {
               </Button>
             </div>
 
-            <main className="py-14 text-[15.5px] leading-7">
+            <main>
               {currentView === "starred" ? (
                 // Starred Articles View
                 starredArticles.length === 0 ? (

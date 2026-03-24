@@ -107,7 +107,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
               href={article.url} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center no-underline bg-gradient-to-r from-foreground to-foreground bg-[length:0_1px] bg-no-repeat bg-left-bottom hover:bg-[length:100%_1px] transition-[background-size,opacity] opacity-90 hover:opacity-100"
+              className="inline-flex items-center justify-center"
             >
               <ArrowSquareOut className="w-4 h-4 mr-2" />
               Read Full Article
