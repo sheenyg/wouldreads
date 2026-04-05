@@ -404,7 +404,7 @@ function App() {
             </p>
           )}
           <p className="mt-4 text-xs">
-            Made with love by Sheena Ganju and GitHub Spark
+            Made with love by Sheena Ganju and GitHub Spark. <a https://github.com/sheenyg/wouldreads">Build your feed</a> 
           </p>
         </footer>
       </div>
