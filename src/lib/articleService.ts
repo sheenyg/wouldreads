@@ -87,6 +87,8 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
     possibleUrls.push("https://www.semafor.com/rss", "https://www.semafor.com/feed.xml")
   } else if (source.name === "The New York Times") {
     possibleUrls.push("https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "https://feeds.nytimes.com/nyt/rss/HomePage")
+  } else if (source.name === "CNN") {
+    possibleUrls.push("https://rss.cnn.com/rss/edition_world.rss", "https://rss.cnn.com/rss/cnn_latest.rss")
   }
   
   // Try multiple proxy services
