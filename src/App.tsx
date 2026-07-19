@@ -39,24 +39,18 @@ function App() {
         },
         {
           id: "3",
-          name: "Sherwood News",
-          url: "https://sherwood.news/feed/",
-          isActive: true
-        },
-        {
-          id: "4",
           name: "The New York Times",
           url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
           isActive: true
         },
         {
-          id: "5",
+          id: "4",
           name: "Hacker News",
           url: "https://hnrss.org/frontpage",
           isActive: true
         },
         {
-          id: "6",
+          id: "5",
           name: "Semafor",
           url: "https://www.semafor.com/feed",
           isActive: true
