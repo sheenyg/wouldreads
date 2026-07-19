@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { ArrowClockwise, Calendar, Newspaper, Star } from "@phosphor-icons/react"
+import { ArrowClockwise, Calendar, Newspaper, Star, Heart } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -15,10 +15,11 @@ function App() {
   const [sources, setSources] = useKV<NewsSource[]>("news-sources", [])
   const [articles, setArticles] = useKV<Article[]>("daily-articles", [])
   const [starredArticles, setStarredArticles] = useKV<Article[]>("starred-articles", [])
+  const [favedArticles, setFavedArticles] = useKV<Article[]>("faved-articles", [])
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
   const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
-  const [currentView, setCurrentView] = useState<"today" | "starred">("today")
+  const [currentView, setCurrentView] = useState<"today" | "starred" | "faves">("today")
 
   const todayKey = getDateKey()
 
@@ -155,8 +156,13 @@ function App() {
         article.id === articleId ? { ...article, isRead: !article.isRead } : article
       )
     )
-    // Also update in starred articles if it exists there
+    // Also update in starred and faved articles if they exist there
     setStarredArticles((current) => 
+      current.map(article => 
+        article.id === articleId ? { ...article, isRead: !article.isRead } : article
+      )
+    )
+    setFavedArticles((current) => 
       current.map(article => 
         article.id === articleId ? { ...article, isRead: !article.isRead } : article
       )
@@ -195,6 +201,29 @@ function App() {
     }
   }
 
+  const toggleArticleFave = (articleId: string) => {
+    // Find the article in daily, starred, or faved articles
+    const dailyArticle = articles.find(a => a.id === articleId)
+    const starredArticle = starredArticles.find(a => a.id === articleId)
+    const favedArticle = favedArticles.find(a => a.id === articleId)
+    const article = dailyArticle || starredArticle || favedArticle
+
+    if (!article) return
+
+    const isFaved = favedArticles.some(a => a.url === article.url)
+
+    if (isFaved) {
+      // Unfave: remove from faved articles
+      setFavedArticles((current) => current.filter(a => a.url !== article.url))
+      toast.success("Article removed from faves")
+    } else {
+      // Fave: add to faved articles
+      const updatedArticle = { ...article, isFaved: true }
+      setFavedArticles((current) => [...current, updatedArticle])
+      toast.success("Article added to faves")
+    }
+  }
+
   const activateAllSources = () => {
     setSources((current) => 
       current.map(source => ({ ...source, isActive: true }))
@@ -204,6 +233,7 @@ function App() {
 
   const activeSources = sources.filter(s => s.isActive)
   const isToday = lastFetchDate === todayKey
+  const isArticleFaved = (article: Article) => favedArticles.some(a => a.url === article.url)
 
   return (
     <div className="min-h-screen bg-background">
@@ -219,56 +249,6 @@ function App() {
         </header>
 
         <div className="space-y-6">
-            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-              <div className="flex items-center flex-wrap gap-3">
-                <SourceManager
-                  sources={sources}
-                  onAddSource={addSource}
-                  onRemoveSource={removeSource}
-                  onToggleSource={toggleSource}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={refreshArticles}
-                  disabled={isLoading}
-                >
-                  <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  Refresh Articles
-                </Button>
-
-                {sources.some(s => !s.isActive) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={activateAllSources}
-                  >
-                    Activate All Sources
-                  </Button>
-                )}
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="feed-mode"
-                    checked={useRealFeeds}
-                    onCheckedChange={setUseRealFeeds}
-                  />
-                  <Label htmlFor="feed-mode" className="text-sm">
-                    {useRealFeeds ? "Live RSS" : "Mock Data"}
-                  </Label>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {isToday ? "Today's selection" : `Last updated: ${lastFetchDate || "Never"}`}
-                </span>
-              </div>
-            </div>
-
-            <Separator className="mb-8" />
-
             {/* View Navigation */}
             <div className="flex justify-center gap-2 mb-6">
               <Button
@@ -283,7 +263,14 @@ function App() {
                 onClick={() => setCurrentView("starred")}
               >
                 <Star className="w-4 h-4 mr-2" />
-                Starred Articles ({starredArticles.length})
+                Starred ({starredArticles.length})
+              </Button>
+              <Button
+                variant={currentView === "faves" ? "default" : "outline"}
+                onClick={() => setCurrentView("faves")}
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Faves ({favedArticles.length})
               </Button>
             </div>
 
@@ -320,6 +307,47 @@ function App() {
                           article={article}
                           onToggleRead={toggleArticleRead}
                           onToggleStar={toggleArticleStar}
+                          onToggleFave={toggleArticleFave}
+                          isFaved={isArticleFaved(article)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )
+              ) : currentView === "faves" ? (
+                // Faves Articles View
+                favedArticles.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Heart className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <h2 className="font-display text-2xl mb-4">No Faves Yet</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                      Heart articles you love to add them to your personal faves collection.
+                    </p>
+                    <Button onClick={() => setCurrentView("today")} variant="outline">
+                      <Newspaper className="w-4 h-4 mr-2" />
+                      View Today's Articles
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h2 className="font-display text-2xl mb-2">
+                        Your Faves
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {favedArticles.filter(a => a.isRead).length} of {favedArticles.length} faves read
+                      </p>
+                    </div>
+                    
+                    <div className="grid gap-6">
+                      {favedArticles.map((article) => (
+                        <ArticleCard
+                          key={article.id}
+                          article={article}
+                          onToggleRead={toggleArticleRead}
+                          onToggleStar={toggleArticleStar}
+                          onToggleFave={toggleArticleFave}
+                          isFaved={true}
                         />
                       ))}
                     </div>
@@ -384,6 +412,8 @@ function App() {
                           article={article}
                           onToggleRead={toggleArticleRead}
                           onToggleStar={toggleArticleStar}
+                          onToggleFave={toggleArticleFave}
+                          isFaved={isArticleFaved(article)}
                         />
                       ))}
                     </div>
@@ -391,6 +421,56 @@ function App() {
                 )
               )}
             </main>
+
+            <Separator className="my-8" />
+
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center flex-wrap gap-3">
+                <SourceManager
+                  sources={sources}
+                  onAddSource={addSource}
+                  onRemoveSource={removeSource}
+                  onToggleSource={toggleSource}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={refreshArticles}
+                  disabled={isLoading}
+                >
+                  <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh Articles
+                </Button>
+
+                {sources.some(s => !s.isActive) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={activateAllSources}
+                  >
+                    Activate All Sources
+                  </Button>
+                )}
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="feed-mode"
+                    checked={useRealFeeds}
+                    onCheckedChange={setUseRealFeeds}
+                  />
+                  <Label htmlFor="feed-mode" className="text-sm">
+                    {useRealFeeds ? "Live RSS" : "Mock Data"}
+                  </Label>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  {isToday ? "Today's selection" : `Last updated: ${lastFetchDate || "Never"}`}
+                </span>
+              </div>
+            </div>
         </div>
 
         <footer className="mt-16 text-center text-sm text-muted-foreground">

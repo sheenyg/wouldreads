@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowSquareOut, Check, ArrowCounterClockwise, Star } from "@phosphor-icons/react"
+import { ArrowSquareOut, Check, ArrowCounterClockwise, Star, Heart } from "@phosphor-icons/react"
 import { Article } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -9,9 +9,11 @@ interface ArticleCardProps {
   article: Article
   onToggleRead: (id: string) => void
   onToggleStar?: (id: string) => void
+  onToggleFave?: (id: string) => void
+  isFaved?: boolean
 }
 
-export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCardProps) {
+export function ArticleCard({ article, onToggleRead, onToggleStar, onToggleFave, isFaved }: ArticleCardProps) {
   const handleCardClick = () => {
     window.open(article.url, '_blank', 'noopener,noreferrer')
   }
@@ -30,24 +32,44 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
     >
       <CardHeader className="pb-3">
         <div className="min-w-0">
-          {onToggleStar && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                handleButtonClick(e)
-                onToggleStar(article.id)
-              }}
-              className="mb-2 -ml-2 h-10 w-10 p-0 hover:bg-accent"
-              aria-label={article.isStarred ? "Unstar article" : "Star article"}
-            >
-              <Star 
-                className="w-5 h-5" 
-                weight={article.isStarred ? "fill" : "regular"}
-                color={article.isStarred ? undefined : "#d1d5db"}
-              />
-            </Button>
-          )}
+          <div className="flex items-center gap-1 -ml-2 mb-2">
+            {onToggleStar && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  handleButtonClick(e)
+                  onToggleStar(article.id)
+                }}
+                className="h-10 w-10 p-0 hover:bg-accent"
+                aria-label={article.isStarred ? "Unstar article" : "Star article"}
+              >
+                <Star 
+                  className="w-5 h-5" 
+                  weight={article.isStarred ? "fill" : "regular"}
+                  color={article.isStarred ? undefined : "#d1d5db"}
+                />
+              </Button>
+            )}
+            {onToggleFave && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  handleButtonClick(e)
+                  onToggleFave(article.id)
+                }}
+                className="h-10 w-10 p-0 hover:bg-accent"
+                aria-label={isFaved ? "Remove from faves" : "Add to faves"}
+              >
+                <Heart 
+                  className="w-5 h-5" 
+                  weight={isFaved ? "fill" : "regular"}
+                  color={isFaved ? "#ef4444" : "#d1d5db"}
+                />
+              </Button>
+            )}
+          </div>
           <h2 className={cn(
             "font-display font-semibold text-lg sm:text-xl leading-tight mb-2 break-words",
             article.isRead && "text-muted-foreground"
