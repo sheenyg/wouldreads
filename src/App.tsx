@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { ArrowClockwise, Calendar, Newspaper, Star } from "@phosphor-icons/react"
+import { ArrowClockwise, Newspaper, Star } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -377,13 +377,6 @@ function App() {
                   </Label>
                 </div>
               </div>
-              
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {isToday ? "Today's selection" : `Last updated: ${lastFetchDate || "Never"}`}
-                </span>
-              </div>
             </div>
         </div>
 
@@ -392,11 +385,6 @@ function App() {
             Currently showing articles from {activeSources.length} active source{activeSources.length !== 1 ? 's' : ''}
             {useRealFeeds ? " • Live RSS feeds" : " • Mock data mode"}
           </p>
-          {useRealFeeds && (
-            <p className="mt-2 text-xs">
-              RSS feeds are fetched via proxy service to handle CORS restrictions
-            </p>
-          )}
           <p className="mt-4 text-xs">
             Made with love by Sheena Ganju and GitHub Spark.{" "}
           <a
