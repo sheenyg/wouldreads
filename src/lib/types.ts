@@ -7,7 +7,6 @@ export interface Article {
   publishedAt: string
   isRead: boolean
   isStarred: boolean
-  isFaved?: boolean
   categories?: string[]
 }
 
