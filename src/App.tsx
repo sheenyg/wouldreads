@@ -2,11 +2,9 @@ import { useEffect, useState } from "react"
 import { useKV } from '@/hooks/useKV'
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
-import { ArrowClockwise, Calendar, Newspaper, Star } from "@phosphor-icons/react"
+import { ArrowClockwise, Newspaper, Star } from "@phosphor-icons/react"
 import { Article, NewsSource } from "@/lib/types"
 import { fetchArticlesFromSources, generateMockArticles, getDateKey } from "@/lib/articleService"
 import { toast, Toaster } from "sonner"
@@ -17,7 +15,6 @@ function App() {
   const [starredArticles, setStarredArticles] = useKV<Article[]>("starred-articles", [])
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
-  const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
   const [currentView, setCurrentView] = useState<"today" | "starred">("today")
 
   const todayKey = getDateKey()
@@ -39,26 +36,20 @@ function App() {
         },
         {
           id: "3",
-          name: "Sherwood News",
-          url: "https://sherwood.news/feed/",
-          isActive: true
-        },
-        {
-          id: "4",
           name: "The New York Times",
           url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
           isActive: true
         },
         {
-          id: "5",
+          id: "4",
           name: "Hacker News",
           url: "https://hnrss.org/frontpage",
           isActive: true
         },
         {
-          id: "6",
+          id: "5",
           name: "Semafor",
-          url: "https://www.semafor.com/feed",
+          url: "https://www.semafor.com/rss.xml",
           isActive: true
         }
       ]
@@ -86,41 +77,29 @@ function App() {
 
     setIsLoading(true)
     try {
-      let newArticles: Article[]
+      toast.info(`Fetching articles from ${activeSources.length} RSS feeds...`)
+      const newArticles = await fetchArticlesFromSources(sources)
       
-      if (useRealFeeds) {
-        toast.info(`Fetching articles from ${activeSources.length} RSS feeds...`)
-        newArticles = await fetchArticlesFromSources(sources)
-        
-        // Count articles per source to provide feedback
-        const sourceNames = activeSources.map(s => s.name)
-        const sourcesWithArticles = [...new Set(newArticles.map(a => a.source))]
-        const failedSources = sourceNames.filter(name => !sourcesWithArticles.includes(name))
-        
-        if (failedSources.length > 0) {
-          toast.warning(`Successfully fetched ${newArticles.length} articles. Failed sources: ${failedSources.join(', ')}`)
-        } else {
-          toast.success(`Fetched ${newArticles.length} articles from all ${sourcesWithArticles.length} sources`)
-        }
+      // Count articles per source to provide feedback
+      const sourceNames = activeSources.map(s => s.name)
+      const sourcesWithArticles = [...new Set(newArticles.map(a => a.source))]
+      const failedSources = sourceNames.filter(name => !sourcesWithArticles.includes(name))
+      
+      if (failedSources.length > 0) {
+        toast.warning(`Successfully fetched ${newArticles.length} articles. Failed sources: ${failedSources.join(', ')}`)
       } else {
-        newArticles = generateMockArticles(sources)
-        toast.success("Generated mock articles")
+        toast.success(`Fetched ${newArticles.length} articles from all ${sourcesWithArticles.length} sources`)
       }
       
       setArticles(newArticles)
       setLastFetchDate(todayKey)
     } catch (error) {
       console.error("Failed to fetch articles:", error)
-      
-      if (useRealFeeds) {
-        toast.error("Failed to fetch from RSS feeds. Using mock articles as fallback.")
-        // Fallback to mock articles if RSS fails
-        const mockArticles = generateMockArticles(sources)
-        setArticles(mockArticles)
-        setLastFetchDate(todayKey)
-      } else {
-        toast.error("Failed to generate articles")
-      }
+      toast.error("Failed to fetch from RSS feeds. Using mock articles as fallback.")
+      // Fallback to mock articles if RSS fails
+      const mockArticles = generateMockArticles(sources)
+      setArticles(mockArticles)
+      setLastFetchDate(todayKey)
     } finally {
       setIsLoading(false)
     }
@@ -219,56 +198,6 @@ function App() {
         </header>
 
         <div className="space-y-6">
-            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-              <div className="flex items-center flex-wrap gap-3">
-                <SourceManager
-                  sources={sources}
-                  onAddSource={addSource}
-                  onRemoveSource={removeSource}
-                  onToggleSource={toggleSource}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={refreshArticles}
-                  disabled={isLoading}
-                >
-                  <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  Refresh Articles
-                </Button>
-
-                {sources.some(s => !s.isActive) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={activateAllSources}
-                  >
-                    Activate All Sources
-                  </Button>
-                )}
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="feed-mode"
-                    checked={useRealFeeds}
-                    onCheckedChange={setUseRealFeeds}
-                  />
-                  <Label htmlFor="feed-mode" className="text-sm">
-                    {useRealFeeds ? "Live RSS" : "Mock Data"}
-                  </Label>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {isToday ? "Today's selection" : `Last updated: ${lastFetchDate || "Never"}`}
-                </span>
-              </div>
-            </div>
-
-            <Separator className="mb-8" />
-
             {/* View Navigation */}
             <div className="flex justify-center gap-2 mb-6">
               <Button
@@ -391,18 +320,46 @@ function App() {
                 )
               )}
             </main>
+
+            <Separator className="my-8" />
+
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center flex-wrap gap-3">
+                <SourceManager
+                  sources={sources}
+                  onAddSource={addSource}
+                  onRemoveSource={removeSource}
+                  onToggleSource={toggleSource}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={refreshArticles}
+                  disabled={isLoading}
+                >
+                  <ArrowClockwise className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh Articles
+                </Button>
+
+                {sources.some(s => !s.isActive) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={activateAllSources}
+                  >
+                    Activate All Sources
+                  </Button>
+                )}
+                
+              </div>
+            </div>
         </div>
 
         <footer className="mt-16 text-center text-sm text-muted-foreground">
           <p>
             Currently showing articles from {activeSources.length} active source{activeSources.length !== 1 ? 's' : ''}
-            {useRealFeeds ? " • Live RSS feeds" : " • Mock data mode"}
+            {" • Live RSS feeds"}
           </p>
-          {useRealFeeds && (
-            <p className="mt-2 text-xs">
-              RSS feeds are fetched via proxy service to handle CORS restrictions
-            </p>
-          )}
           <p className="mt-4 text-xs">
             Made with love by Sheena Ganju and GitHub Spark.{" "}
           <a

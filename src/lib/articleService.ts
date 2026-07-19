@@ -102,10 +102,8 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
   const possibleUrls = [source.url]
   
   // Add alternative URLs for known sources
-  if (source.name === "Sherwood News") {
-    possibleUrls.push("https://sherwood.news/rss", "https://sherwood.news/feed.xml")
-  } else if (source.name === "Semafor") {
-    possibleUrls.push("https://www.semafor.com/rss", "https://www.semafor.com/feed.xml")
+  if (source.name === "Semafor") {
+    possibleUrls.push("https://www.semafor.com/feed", "https://www.semafor.com/rss")
   } else if (source.name === "The New York Times") {
     possibleUrls.push("https://rss.nytimes.com/services/xml/rss/nyt/World.xml", "https://feeds.nytimes.com/nyt/rss/HomePage")
   }

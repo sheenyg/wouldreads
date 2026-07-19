@@ -38,7 +38,7 @@ export function ArticleCard({ article, onToggleRead, onToggleStar }: ArticleCard
                 handleButtonClick(e)
                 onToggleStar(article.id)
               }}
-              className="mb-2 -ml-2 h-10 w-10 p-0 hover:bg-accent"
+              className="mb-2 -ml-2 h-10 w-10 p-0 hover:bg-teal-100 dark:hover:bg-teal-900"
               aria-label={article.isStarred ? "Unstar article" : "Star article"}
             >
               <Star 
