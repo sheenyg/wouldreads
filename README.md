@@ -1,11 +1,11 @@
 # Wouldreads
 
 Welcome to **Wouldreads**, an article aggregator designed for effortless daily news consumption.  
-You can try out the live app here: [https://daily-digest-aggrega--sheenyg.github.app/](https://sheenyg.github.io/wouldreads/)
+You can try out the live app here: [https://sheenyg.github.io/wouldreads/](https://sheenyg.github.io/wouldreads/)
 
 ## About
 
-Wouldreads is currently at **version 1.1**. The app collects news articles from various sources, presenting them in a clean, easy-to-digest format for my daily reading.
+Wouldreads is currently at **version 1.1**. The app collects news articles from various sources, presenting them in a clean format for my daily reading.
 
 ---
 
@@ -32,8 +32,6 @@ If you’d like to contribute to this main version, here are some great ways to 
 ## License
 
 This project is open to community contributions!
-
-Wouldreads was built using [GitHub Spark](https://githubnext.com/projects/spark/) and is subject to the [GitHub Spark License](https://github.com/githubnext/spark/blob/main/LICENSE):
 
 ```
 MIT License
