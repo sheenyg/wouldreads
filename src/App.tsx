@@ -2,8 +2,6 @@ import { useEffect, useState } from "react"
 import { useKV } from '@/hooks/useKV'
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { ArticleCard } from "@/components/ArticleCard"
 import { SourceManager } from "@/components/SourceManager"
 import { ArrowClockwise, Newspaper, Star } from "@phosphor-icons/react"
@@ -17,7 +15,6 @@ function App() {
   const [starredArticles, setStarredArticles] = useKV<Article[]>("starred-articles", [])
   const [lastFetchDate, setLastFetchDate] = useKV<string>("last-fetch-date", "")
   const [isLoading, setIsLoading] = useState(false)
-  const [useRealFeeds, setUseRealFeeds] = useKV<boolean>("use-real-feeds", true)
   const [currentView, setCurrentView] = useState<"today" | "starred">("today")
 
   const todayKey = getDateKey()
@@ -52,7 +49,7 @@ function App() {
         {
           id: "5",
           name: "Semafor",
-          url: "https://www.semafor.com/feed",
+          url: "https://www.semafor.com/rss.xml",
           isActive: true
         }
       ]
@@ -80,41 +77,29 @@ function App() {
 
     setIsLoading(true)
     try {
-      let newArticles: Article[]
+      toast.info(`Fetching articles from ${activeSources.length} RSS feeds...`)
+      const newArticles = await fetchArticlesFromSources(sources)
       
-      if (useRealFeeds) {
-        toast.info(`Fetching articles from ${activeSources.length} RSS feeds...`)
-        newArticles = await fetchArticlesFromSources(sources)
-        
-        // Count articles per source to provide feedback
-        const sourceNames = activeSources.map(s => s.name)
-        const sourcesWithArticles = [...new Set(newArticles.map(a => a.source))]
-        const failedSources = sourceNames.filter(name => !sourcesWithArticles.includes(name))
-        
-        if (failedSources.length > 0) {
-          toast.warning(`Successfully fetched ${newArticles.length} articles. Failed sources: ${failedSources.join(', ')}`)
-        } else {
-          toast.success(`Fetched ${newArticles.length} articles from all ${sourcesWithArticles.length} sources`)
-        }
+      // Count articles per source to provide feedback
+      const sourceNames = activeSources.map(s => s.name)
+      const sourcesWithArticles = [...new Set(newArticles.map(a => a.source))]
+      const failedSources = sourceNames.filter(name => !sourcesWithArticles.includes(name))
+      
+      if (failedSources.length > 0) {
+        toast.warning(`Successfully fetched ${newArticles.length} articles. Failed sources: ${failedSources.join(', ')}`)
       } else {
-        newArticles = generateMockArticles(sources)
-        toast.success("Generated mock articles")
+        toast.success(`Fetched ${newArticles.length} articles from all ${sourcesWithArticles.length} sources`)
       }
       
       setArticles(newArticles)
       setLastFetchDate(todayKey)
     } catch (error) {
       console.error("Failed to fetch articles:", error)
-      
-      if (useRealFeeds) {
-        toast.error("Failed to fetch from RSS feeds. Using mock articles as fallback.")
-        // Fallback to mock articles if RSS fails
-        const mockArticles = generateMockArticles(sources)
-        setArticles(mockArticles)
-        setLastFetchDate(todayKey)
-      } else {
-        toast.error("Failed to generate articles")
-      }
+      toast.error("Failed to fetch from RSS feeds. Using mock articles as fallback.")
+      // Fallback to mock articles if RSS fails
+      const mockArticles = generateMockArticles(sources)
+      setArticles(mockArticles)
+      setLastFetchDate(todayKey)
     } finally {
       setIsLoading(false)
     }
@@ -366,16 +351,6 @@ function App() {
                   </Button>
                 )}
                 
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="feed-mode"
-                    checked={useRealFeeds}
-                    onCheckedChange={setUseRealFeeds}
-                  />
-                  <Label htmlFor="feed-mode" className="text-sm">
-                    {useRealFeeds ? "Live RSS" : "Mock Data"}
-                  </Label>
-                </div>
               </div>
             </div>
         </div>
@@ -383,7 +358,7 @@ function App() {
         <footer className="mt-16 text-center text-sm text-muted-foreground">
           <p>
             Currently showing articles from {activeSources.length} active source{activeSources.length !== 1 ? 's' : ''}
-            {useRealFeeds ? " • Live RSS feeds" : " • Mock data mode"}
+            {" • Live RSS feeds"}
           </p>
           <p className="mt-4 text-xs">
             Made with love by Sheena Ganju and GitHub Spark.{" "}
