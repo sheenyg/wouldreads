@@ -1,6 +1,27 @@
 import { Article, NewsSource } from './types'
 
 /**
+ * Sections to exclude from The New Yorker feed
+ */
+const EXCLUDED_NEW_YORKER_SECTIONS = [
+  'humor',
+  'fiction',
+  'poetry',
+  'games'
+]
+
+/**
+ * Checks if a New Yorker article should be excluded based on its categories
+ */
+function isExcludedNewYorkerArticle(categories: string[]): boolean {
+  return categories.some(category =>
+    EXCLUDED_NEW_YORKER_SECTIONS.some(section =>
+      category.toLowerCase().includes(section)
+    )
+  )
+}
+
+/**
  * Shuffles an array using Fisher-Yates algorithm
  */
 function shuffleArray<T>(array: T[]): T[] {
@@ -133,7 +154,8 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
             source: source.name,
             publishedAt: item.pubDate || new Date().toISOString(),
             isRead: false,
-            isStarred: false
+            isStarred: false,
+            categories: Array.isArray(item.categories) ? item.categories : []
           }))
         } else {
           // allorigins format - need to parse XML manually
@@ -156,6 +178,7 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
             const description = item.querySelector('description')?.textContent || 'No summary available'
             const link = item.querySelector('link')?.textContent || '#'
             const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString()
+            const categories = Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || '').filter(Boolean)
             
             return {
               id: `${source.id}-${Date.now()}-${index}`,
@@ -165,9 +188,19 @@ async function fetchArticlesFromRSS(source: NewsSource): Promise<Article[]> {
               source: source.name,
               publishedAt: pubDate,
               isRead: false,
-              isStarred: false
+              isStarred: false,
+              categories
             }
           })
+        }
+
+        // Filter out excluded sections for The New Yorker
+        if (source.name === 'The New Yorker') {
+          const beforeCount = articles.length
+          articles = articles.filter(article =>
+            !article.categories || !isExcludedNewYorkerArticle(article.categories)
+          )
+          console.log(`Filtered ${beforeCount - articles.length} New Yorker articles from excluded sections`)
         }
 
         console.log(`Successfully parsed ${articles.length} articles from ${source.name} using ${url}`)

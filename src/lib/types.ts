@@ -7,6 +7,7 @@ export interface Article {
   publishedAt: string
   isRead: boolean
   isStarred: boolean
+  categories?: string[]
 }
 
 export interface NewsSource {
