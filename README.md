@@ -9,6 +9,49 @@ Wouldreads is currently at **version 1.1**. The app collects news articles from 
 
 ---
 
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Language | TypeScript |
+| UI framework | React 19 |
+| Build tool | Vite (with `@vitejs/plugin-react-swc`) |
+| Styling | Tailwind CSS v4 via `@tailwindcss/vite` |
+| Component primitives | Radix UI |
+
+---
+
+## Local development
+
+**Prerequisites:** Node.js LTS and npm.
+
+```bash
+# Install dependencies (clean install from lockfile)
+npm ci
+
+# Start the dev server (http://localhost:5173)
+npm run dev
+
+# Lint the codebase
+npm run lint
+```
+
+---
+
+## Build & deploy
+
+```bash
+# Compile TypeScript and bundle with Vite
+npm run build
+
+# Preview the production build locally
+npm run preview
+```
+
+**GitHub Pages note:** Vite is configured with `base: "/wouldreads/"` in `vite.config.ts` so that assets resolve correctly when deployed to `https://sheenyg.github.io/wouldreads/`. If you fork this repo or deploy to a different URL, update the `base` value to match your repository name or deploy path.
+
+---
+
 ## Contributing
 
 Feel free to **fork** this repository and create your own version of Wouldreads!
