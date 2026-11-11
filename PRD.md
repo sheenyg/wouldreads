@@ -67,13 +67,13 @@ Complementary (opposite colors) - Using a sophisticated blue/orange pairing to c
 
 ## Font Selection
 
-Typography should convey authority and readability with a modern serif for headlines to suggest journalistic credibility and clean sans-serif for body text.
+Typography pairs Newsreader for headlines and article summaries with Inter for interface text and metadata. Newsreader is self-hosted under the SIL Open Font License.
 
 - **Typographic Hierarchy**:
-  - H1 (App Title): Playfair Display Bold/32px/tight letter spacing
-  - H2 (Article Headlines): Playfair Display SemiBold/24px/normal spacing
-  - Body (Article Text): Inter Regular/16px/1.5 line height
-  - Caption (Sources/Meta): Inter Medium/14px/muted color
+  - H1 (App Title): Newsreader Bold/24px mobile, 36px desktop
+  - H2 (Article Headlines): Newsreader SemiBold/20px/24px line height
+  - Body (Article Summary): Newsreader Regular/16px/21px line height; two-line preview with an accessible More/Less control when truncated
+  - Caption (Sources/Meta): Inter Regular/12px/muted color
 
 ## Animations
 
@@ -84,9 +84,9 @@ Subtle functionality-focused animations that guide attention during content upda
 
 ## Component Selection
 
-- **Components**: Card (article display), Button (actions), Input (URL entry), Badge (source labels), Separator (content division), Dialog (source management)
-- **Customizations**: Custom article card layout with image, metadata, and action states
-- **States**: Cards have hover elevation, buttons show clear pressed states, inputs validate in real-time
+- **Components**: Card (article display), Button (actions), Input (URL entry), Separator (content division), Dialog (source management)
+- **Customizations**: Compact article cards with top-right stars, inline source/date metadata, and wrapping text actions. The Today feed starts directly below navigation without a separate heading or read-count line.
+- **States**: Cards have subtle hover borders, buttons show clear pressed states, inputs validate in real-time
 - **Icon Selection**: Plus (add source), X (remove), ExternalLink (read more), Check (mark read)
-- **Spacing**: Consistent 4/6/8 unit spacing scale (16px/24px/32px) with generous whitespace
+- **Spacing**: Article cards use 16px padding, an 8px header/content gap, 12px feed gaps, 1px borders, and 8px corners in both Today and Starred views
 - **Mobile**: Single column layout, touch-friendly buttons (44px minimum), collapsible source management

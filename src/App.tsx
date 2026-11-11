@@ -182,7 +182,6 @@ function App() {
   }
 
   const activeSources = sources.filter(s => s.isActive)
-  const isToday = lastFetchDate === todayKey
 
   return (
     <div className="min-h-screen bg-background">
@@ -242,7 +241,7 @@ function App() {
                       </p>
                     </div>
                     
-                    <div className="grid gap-6">
+                    <div className="grid gap-3">
                       {starredArticles.map((article) => (
                         <ArticleCard
                           key={article.id}
@@ -296,26 +295,15 @@ function App() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <h2 className="font-display text-2xl mb-2">
-                        {isToday ? "Today's Curated Articles" : "Latest Articles"}
-                      </h2>
-                      <p className="text-muted-foreground">
-                        {articles.filter(a => a.isRead).length} of {articles.length} articles read • Showing articles from all active sources
-                      </p>
-                    </div>
-                    
-                    <div className="grid gap-6">
-                      {articles.map((article) => (
-                        <ArticleCard
-                          key={article.id}
-                          article={article}
-                          onToggleRead={toggleArticleRead}
-                          onToggleStar={toggleArticleStar}
-                        />
-                      ))}
-                    </div>
+                  <div className="grid gap-3">
+                    {articles.map((article) => (
+                      <ArticleCard
+                        key={article.id}
+                        article={article}
+                        onToggleRead={toggleArticleRead}
+                        onToggleStar={toggleArticleStar}
+                      />
+                    ))}
                   </div>
                 )
               )}
