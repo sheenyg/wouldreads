@@ -76,20 +76,20 @@
 **Color Accessibility**: All pairings exceed WCAG AA contrast requirements (4.5:1 minimum)
 
 ### Typography System
-**Font Pairing Strategy**: Playfair Display (serif) for headlines creates editorial authority, Inter (sans-serif) for body ensures digital readability
+**Font Pairing Strategy**: Newsreader (serif) for headlines and summaries creates editorial authority; Inter (sans-serif) keeps controls and metadata easy to scan
 **Typographic Hierarchy**: Clear distinction between article headlines, source attribution, summaries, and UI elements
-**Font Personality**: Playfair conveys established journalism credibility, Inter provides modern accessibility
-**Readability Focus**: Generous line spacing (1.5x), optimal line length (45-75 characters), scalable sizing
+**Font Personality**: Newsreader conveys established journalism credibility, Inter provides modern accessibility
+**Readability Focus**: 20px/24px article headlines and 16px/21px summaries; full headlines remain visible and truncated two-line summaries can be expanded
 **Typography Consistency**: Consistent heading scales using mathematical ratios
-**Which fonts**: Playfair Display for display text, Inter for interface and body text
+**Which fonts**: Self-hosted Newsreader for display text and article summaries, Inter for interface text
 **Legibility Check**: Both fonts tested across sizes and weights for optimal readability
 
 ### Visual Hierarchy & Layout
-**Attention Direction**: Headlines draw focus, source attribution provides context, progress indicators show completion
-**White Space Philosophy**: Generous breathing room between articles, focused content blocks without clutter
+**Attention Direction**: Headlines draw focus, inline source/date metadata provides context, and top-right stars keep saving within reach. Today opens directly onto articles without a feed heading or read-count line.
+**White Space Philosophy**: Compact cards with 16px padding, 8px header/content spacing, and 12px gaps between articles
 **Grid System**: Card-based layout with consistent spacing using Tailwind's design system
 **Responsive Approach**: Mobile-first with content prioritization on smaller screens
-**Content Density**: Prioritizes readability over information density - each article gets proper visual space
+**Content Density**: Condense spacing rather than text; keep full headlines and wrap inline actions only when necessary
 
 ### Animations
 **Purposeful Meaning**: Subtle loading states communicate fetching progress, toggle states confirm user actions
@@ -98,7 +98,7 @@
 
 ### UI Elements & Component Selection
 **Component Usage**: Cards for article presentation, Buttons for primary actions, Switches for mode toggles, Dialogs for source management
-**Component Customization**: Rounded corners (0.75rem) for modern feel, subtle shadows for depth
+**Component Customization**: Article cards use 8px corners, 1px borders, and a subtle hover border instead of elevation
 **Component States**: Clear hover, active, and disabled states for all interactive elements
 **Icon Selection**: Phosphor icons for consistency - RefreshCw for updates, Calendar for time context, Settings for configuration
 **Component Hierarchy**: Primary buttons for main actions, outline buttons for secondary actions, switch toggles for preferences
